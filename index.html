@@ -3232,6 +3232,32 @@ window.addEventListener('DOMContentLoaded', () => {
     initApp();
 });
 
+// ==== AUTOMATIC DAILY INCOME SCHEDULER ====
+// Runs autoReleaseDueInvestments() on app load, every 60s, and whenever the
+// tab regains focus. This is what makes daily income fully automatic — the
+// admin no longer needs to click a release button. Each investment's
+// `nextReleaseAt` field (set at purchase) drives the schedule.
+function startAutoReleaseScheduler() {
+    // Immediate first pass (covers users who kept the app open across the release moment).
+    try { autoReleaseDueInvestments(); } catch (e) { console.error('Auto-release boot error:', e); }
+
+    // Periodic background pass every 60 seconds.
+    if (window._autoReleaseInterval) clearInterval(window._autoReleaseInterval);
+    window._autoReleaseInterval = setInterval(() => {
+        try { autoReleaseDueInvestments(); } catch (e) { console.error('Auto-release tick error:', e); }
+    }, 60000);
+
+    // Re-check when the tab regains focus (user returns after a long break).
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            try { autoReleaseDueInvestments(); } catch (e) { /* ignore */ }
+        }
+    });
+    window.addEventListener('focus', () => {
+        try { autoReleaseDueInvestments(); } catch (e) { /* ignore */ }
+    });
+}
+
 function initApp() {
     // 1. Slideshow Hero Rotation
     let slideIndex = 0;
@@ -3337,6 +3363,12 @@ function initApp() {
     }
 
     renderCheckinGrid();
+
+    // 4. Start the automatic daily-income scheduler (runs regardless of who's
+    // logged in — it scans ALL users in the DB and credits every due investment).
+    startAutoReleaseScheduler();
+    // Start the live "Next release in: Xh Ym" ticker for the My Plans view.
+    startReleaseCountdownTicker();
 }
 
 // ==== USER REALTIME SYNC ====
@@ -3715,6 +3747,10 @@ function buyPlan(planId) {
         days: plan.days,
         daysClaimed: 0,
         purchaseDate: new Date().toISOString(),
+        // Auto-release scheduler: next payout is due exactly 1 day after purchase.
+        // The autoReleaseDueInvestments() engine reads this field and credits the
+        // user's balance when nextReleaseAt <= now (runs on app open + every 60s).
+        nextReleaseAt: new Date(Date.now() + 86400000).toISOString(),
         status: "active"
     };
 
@@ -3769,8 +3805,8 @@ function renderMyInvestments() {
             <div class="my-invest-progress">
                 <div class="my-invest-bar" style="width: ${pct}%"></div>
             </div>
-            <div class="mi-release-strip ${inv.status === 'completed' ? '' : 'pending'}">
-                <span><i class="fa-solid fa-circle-info"></i> Returns released by admin</span>
+            <div class="mi-release-strip ${inv.status === 'completed' ? '' : 'pending'}" data-next-release="${inv.nextReleaseAt || ''}">
+                <span><i class="fa-solid fa-clock-rotate-left"></i> ${inv.status === 'completed' ? 'Plan completed — all returns released' : '<span class="strip-countdown">Next release: calculating…</span>'}</span>
                 <span class="strip-time">${inv.status.toUpperCase()}</span>
             </div>
         </div>
@@ -5386,32 +5422,44 @@ function renderAdminContent() {
     } 
     
     else if (activeAdminTab === 'daily') {
-        // === SINGLE GLOBAL RELEASE BUTTON ===
-        // Count active investments per plan + total daily payout, across ALL users.
+        // === AUTOMATIC RELEASE — admin view is now informational ===
+        // Daily income is released automatically by the client-side scheduler
+        // (autoReleaseDueInvestments) based on each investment's nextReleaseAt
+        // timestamp — no admin click required. The button below is an emergency
+        // manual trigger for support cases only.
         let totalActive = 0;
+        let totalDueNow = 0;
         let totalDailyPayout = 0;
         let planSummary = [];
 
+        const now = Date.now();
         PLANS.forEach(plan => {
             let countActive = 0;
+            let countDue = 0;
             allUsersCache.forEach(u => {
                 if (u.investments) {
                     Object.values(u.investments).forEach(i => {
                         if (i.planId === plan.id && i.status === 'active') {
                             countActive++;
+                            const nextMs = i.nextReleaseAt ? new Date(i.nextReleaseAt).getTime() : 0;
+                            if (nextMs && nextMs <= now) countDue++;
                         }
                     });
                 }
             });
             const planDailyPayout = countActive * (Number(plan.daily) || 0);
             totalActive += countActive;
+            totalDueNow += countDue;
             totalDailyPayout += planDailyPayout;
-            planSummary.push({ name: plan.name, count: countActive, daily: plan.daily, total: planDailyPayout });
+            planSummary.push({ name: plan.name, count: countActive, due: countDue, daily: plan.daily, total: planDailyPayout });
         });
 
         let html = `
         <h3 style="font-size:1rem; font-weight:800; margin-bottom:4px; text-transform:uppercase;">Daily Income Release</h3>
-        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;">One button releases today's earnings for all active investments across every plan.</p>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;">
+            <i class="fa-solid fa-circle-check" style="color:var(--primary);"></i>
+            <b>Auto-release is ON.</b> Each investment pays out daily based on its own purchase time — no manual click needed.
+        </p>
         `;
 
         if (PLANS.length === 0) {
@@ -5420,25 +5468,34 @@ function renderAdminContent() {
             return;
         }
 
-        // Master summary card + single global release button
+        // Status card (informational — scheduler is running)
         html += `
         <div class="di-plan-card" style="border-left:4px solid var(--primary);">
             <div class="di-plan-head">
                 <div class="di-plan-info">
-                    <div class="di-plan-name" style="font-size:1.05rem;">All Plans · Global Release</div>
-                    <div class="di-plan-meta">${totalActive} active investment(s) · ETB ${totalDailyPayout.toFixed(2)} total payout today</div>
+                    <div class="di-plan-name" style="font-size:1.05rem;">
+                        <i class="fa-solid fa-robot" style="color:var(--primary); margin-right:6px;"></i>
+                        Auto-Scheduler Running
+                    </div>
+                    <div class="di-plan-meta">
+                        ${totalActive} active investment(s) · ${totalDueNow} due right now · ETB ${totalDailyPayout.toFixed(2)} total daily payout
+                    </div>
                 </div>
-                <span class="di-status-badge ${totalActive > 0 ? 'pending' : 'empty'}">
-                    ${totalActive} Active
+                <span class="di-status-badge ${totalDueNow > 0 ? 'pending' : 'empty'}">
+                    ${totalDueNow} DUE
                 </span>
             </div>
-            <button class="di-release-btn go" id="globalReleaseBtn" onclick="adminReleaseDailyIncome()" ${totalActive === 0 ? 'disabled' : ''}>
-                <i class="fa-solid fa-bolt"></i> Release All Daily Earnings
+            <div style="font-size:0.75rem; color:var(--text-muted); padding:8px 4px 12px; line-height:1.5;">
+                <i class="fa-solid fa-info-circle"></i>
+                The system checks every 60 seconds and on every app open. Users are credited automatically the instant their next release time passes. Use the button below only for emergency support.
+            </div>
+            <button class="di-release-btn go" id="globalReleaseBtn" onclick="adminReleaseDailyIncome()" ${totalDueNow === 0 ? 'disabled' : ''}>
+                <i class="fa-solid fa-bolt"></i> Force Release (${totalDueNow} due)
             </button>
         </div>
         `;
 
-        // Per-plan breakdown (read-only, for visibility) — each plan's individual payout
+        // Per-plan breakdown (read-only)
         if (planSummary.length > 0) {
             html += `<h4 style="font-size:0.78rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px; margin:18px 0 10px;">Breakdown by Plan</h4>`;
             planSummary.forEach(p => {
@@ -5447,10 +5504,10 @@ function renderAdminContent() {
                     <div class="di-plan-head">
                         <div class="di-plan-info">
                             <div class="di-plan-name">${p.name}</div>
-                            <div class="di-plan-meta">ETB ${p.daily}/day per investment · ${p.count} active · ETB ${p.total.toFixed(2)} today</div>
+                            <div class="di-plan-meta">ETB ${p.daily}/day per investment · ${p.count} active (${p.due} due) · ETB ${p.total.toFixed(2)}/day</div>
                         </div>
-                        <span class="di-status-badge ${p.count > 0 ? 'pending' : 'empty'}">
-                            ${p.count} Active
+                        <span class="di-status-badge ${p.due > 0 ? 'pending' : (p.count > 0 ? 'released' : 'empty')}">
+                            ${p.due > 0 ? p.due + ' DUE' : p.count + ' ACTIVE'}
                         </span>
                     </div>
                 </div>
@@ -5802,6 +5859,133 @@ function adminReleaseDailyIncome(planId) {
         }
         renderAdminContent();
     });
+}
+
+// ==== AUTOMATIC DAILY INCOME RELEASE ====
+// Runs in the background — no admin action required. Each investment has a
+// `nextReleaseAt` ISO timestamp (set at purchase to purchaseDate + 1 day).
+// When that timestamp passes, this engine:
+//   1. Atomically updates the investment (transaction — safe across multiple
+//      tabs/devices, only one client can claim a given release window).
+//   2. Credits the user's balance with the plan's daily payout.
+//   3. Pushes a "Daily Auto-Release" transaction into the user's history.
+//   4. Bumps nextReleaseAt by +24h, or marks the plan as `completed` when
+//      all days have been paid out.
+let _autoReleaseRunning = false;
+function autoReleaseDueInvestments() {
+    // Avoid concurrent runs (e.g. visibility + interval firing together).
+    if (_autoReleaseRunning) return;
+    _autoReleaseRunning = true;
+
+    const now = Date.now();
+    db.ref('users').once('value', (snapshot) => {
+        if (!snapshot.exists()) { _autoReleaseRunning = false; return; }
+
+        let releasedThisRun = 0;
+        const updates = [];
+
+        snapshot.forEach(userSnap => {
+            const phone = userSnap.key;
+            const userData = userSnap.val();
+            if (!userData.investments) return;
+
+            Object.values(userData.investments).forEach(inv => {
+                if (inv.status !== 'active') return;
+
+                // Backfill nextReleaseAt for legacy investments that pre-date the scheduler.
+                let nextIso = inv.nextReleaseAt;
+                if (!nextIso) {
+                    const purchaseMs = new Date(inv.purchaseDate).getTime();
+                    if (isNaN(purchaseMs)) return;
+                    // For legacy data: assume releases have been happening daily since
+                    // purchase, so the next release is (alreadyClaimed + 1) days after purchase.
+                    const daysOffset = ((inv.daysClaimed || 0) + 1) * 86400000;
+                    nextIso = new Date(purchaseMs + daysOffset).toISOString();
+                    // Persist the backfill so the next pass uses the same schedule.
+                    db.ref(`users/${phone}/investments/${inv.id}/nextReleaseAt`).set(nextIso);
+                }
+
+                const nextMs = new Date(nextIso).getTime();
+                if (isNaN(nextMs) || nextMs > now) return; // not due yet
+
+                // Atomic transaction — prevents double-release if two clients race.
+                const invRef = db.ref(`users/${phone}/investments/${inv.id}`);
+                invRef.transaction((current) => {
+                    if (!current) return;
+                    if (current.status !== 'active') return;
+                    const curNextMs = current.nextReleaseAt ? new Date(current.nextReleaseAt).getTime() : 0;
+                    if (curNextMs > now) return; // another client already released this window
+
+                    const newDaysClaimed = (current.daysClaimed || 0) + 1;
+                    const isFinished = newDaysClaimed >= current.days;
+                    const nextIntervalMs = curNextMs + 86400000; // schedule next release +24h
+
+                    current.daysClaimed = newDaysClaimed;
+                    current.status = isFinished ? 'completed' : 'active';
+                    current.nextReleaseAt = isFinished ? current.nextReleaseAt : new Date(nextIntervalMs).toISOString();
+                    current.lastReleasedAt = new Date(now).toISOString();
+                    return current;
+                }, (err, committed, snap) => {
+                    if (err || !committed) return;
+                    const updated = snap.val();
+                    if (!updated) return;
+
+                    const payout = Number(updated.daily) || 0;
+                    if (payout <= 0) return;
+
+                    // Credit user balance atomically.
+                    db.ref(`users/${phone}/balance`).transaction((bal) => (bal || 0) + payout);
+
+                    // Log a transaction so the user sees the credit in their history.
+                    const txnRef = db.ref(`users/${phone}/transactions`).push();
+                    txnRef.set({
+                        id: txnRef.key,
+                        type: 'income',
+                        title: `${updated.name} Daily Auto-Release`,
+                        amount: payout,
+                        date: new Date().toISOString(),
+                        status: 'completed'
+                    });
+
+                    releasedThisRun++;
+                    // Live toast for the currently logged-in user.
+                    if (state.user && state.user.phone === phone) {
+                        showToast(`Daily ETB ${payout} auto-released for ${updated.name}.`);
+                    }
+                });
+            });
+        });
+
+        _autoReleaseRunning = false;
+    }, () => { _autoReleaseRunning = false; });
+}
+
+// Live "Next release in: Xh Ym" countdown updater for the user's My Plans view.
+// Runs every second; only touches DOM nodes that have the data-next-release attr.
+let _releaseCountdownInterval = null;
+function startReleaseCountdownTicker() {
+    if (_releaseCountdownInterval) return;
+    _releaseCountdownInterval = setInterval(() => {
+        const strips = document.querySelectorAll('.mi-release-strip[data-next-release]');
+        if (strips.length === 0) return;
+        const now = Date.now();
+        strips.forEach(strip => {
+            const iso = strip.getAttribute('data-next-release');
+            const target = strip.querySelector('.strip-countdown');
+            if (!target || !iso) return;
+            const diff = new Date(iso).getTime() - now;
+            if (diff <= 0) { target.textContent = 'Releasing now…'; return; }
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            if (h >= 24) {
+                const d = Math.floor(h / 24);
+                target.textContent = `Next release in: ${d}d ${h % 24}h ${m}m`;
+            } else {
+                target.textContent = `Next release in: ${h}h ${m}m ${s}s`;
+            }
+        });
+    }, 1000);
 }
 
 function adminModifyUserBalance(phone, action) {
