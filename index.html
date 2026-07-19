@@ -434,6 +434,32 @@
             color: #7c2d12; margin-top: 4px; font-size: 0.9rem;
         }
 
+        /* ---------- PLAN REQUIRED BANNER ---------- */
+        .plan-required-banner {
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            border: 1.5px solid #8b5cf6;
+            color: #5b21b6;
+            border-radius: 12px; padding: 12px 14px;
+            margin-bottom: 16px;
+            display: flex; align-items: flex-start; gap: 10px;
+            font-size: 0.82rem; font-weight: 700;
+        }
+        .plan-required-banner i {
+            color: #6d28d9; font-size: 1.1rem; margin-top: 1px;
+        }
+        .plan-required-banner .pr-title {
+            font-size: 0.85rem; font-weight: 800; margin-bottom: 3px;
+            text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .plan-required-banner .pr-action {
+            background: #6d28d9; color: white; border: none;
+            border-radius: 8px; padding: 7px 12px; font-size: 0.72rem;
+            font-weight: 800; text-transform: uppercase; cursor: pointer;
+            font-family: inherit; letter-spacing: 0.3px; margin-top: 8px;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .plan-required-banner .pr-action:active { transform: scale(0.96); }
+
         /* Withdraw form disabled visual state */
         #withdrawForm.locked { position: relative; pointer-events: none; opacity: 0.55; }
         #withdrawForm.locked::after {
@@ -2088,7 +2114,7 @@
         <i class="fa-solid fa-moon" style="font-size: 3.5rem; color: #b45309; margin-bottom: 12px;"></i>
         <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">Withdrawals are paused</h2>
         <p style="color: var(--text-muted); font-size: 0.88rem; font-weight: 600; margin-bottom: 14px;">
-            For your safety, withdrawals are not allowed between <b>11:00 PM</b> and <b>3:00 AM</b> Ethiopian time.
+            For your safety, withdrawals are only allowed between <b>3:00 AM</b> and <b>11:00 AM</b> Ethiopian time.
         </p>
         <div style="background: #fef3c7; border-radius: 10px; padding: 12px; font-family: 'Courier New', monospace; font-weight: 800; color: #92400e; margin-bottom: 18px; font-size: 1.05rem;" id="timeLockModalCountdown">
             Reopens in --:--:--
@@ -2107,6 +2133,21 @@
         </p>
         <button class="btn-full primary" onclick="closeModal('bindBankGateModal'); openBindBankModal();"><i class="fa-solid fa-link"></i> Bind Bank Account</button>
         <button class="btn-full outline" style="margin-top: 8px;" onclick="closeModal('bindBankGateModal')">Maybe later</button>
+    </div>
+</div>
+
+<!-- ===== INVESTMENT PLAN REQUIRED MODAL ===== -->
+<div id="planRequiredModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <i class="fa-solid fa-chart-pie" style="font-size: 3.5rem; color: #6d28d9; margin-bottom: 12px;"></i>
+        <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">Active investment plan required</h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem; font-weight: 600; margin-bottom: 18px;">
+            You must have <b>at least one active investment plan</b> before you can request a withdrawal. Pick a plan to start earning daily returns and unlock withdrawals.
+        </p>
+        <button class="btn-full primary" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);" onclick="closeModal('planRequiredModal'); switchView('plans');">
+            <i class="fa-solid fa-rocket"></i> Browse Plans
+        </button>
+        <button class="btn-full outline" style="margin-top: 8px;" onclick="closeModal('planRequiredModal')">Maybe later</button>
     </div>
 </div>
 
@@ -2485,13 +2526,23 @@
                 <!-- Filled by renderBankBindCard() -->
             </div>
 
-            <!-- ===== TIME LOCK BANNER (visible only during 23:00–03:00 EAT) ===== -->
+            <!-- ===== TIME LOCK BANNER (visible only during 11:00–03:00 EAT) ===== -->
             <div id="timeLockBanner" class="time-lock-banner" style="display: none;">
                 <i class="fa-solid fa-moon"></i>
                 <div style="flex:1;">
                     <div class="tl-title"><i class="fa-solid fa-lock"></i> Withdrawals are paused</div>
-                    <div>Withdrawals are not allowed between <b>11:00 PM</b> and <b>3:00 AM</b> Ethiopian time. Please come back later.</div>
+                    <div>Withdrawals are only allowed between <b>3:00 AM</b> and <b>11:00 AM</b> Ethiopian time. The current window is closed — please come back during the allowed hours.</div>
                     <div class="tl-countdown" id="timeLockCountdown">Reopens in --:--:--</div>
+                </div>
+            </div>
+
+            <!-- ===== PLAN REQUIRED BANNER (visible when user has no active investment plan) ===== -->
+            <div id="planRequiredBanner" class="plan-required-banner" style="display: none;">
+                <i class="fa-solid fa-chart-pie"></i>
+                <div style="flex:1;">
+                    <div class="pr-title"><i class="fa-solid fa-lock"></i> Active plan required to withdraw</div>
+                    <div>You need at least one <b>active investment plan</b> to request a withdrawal. Pick a plan to start earning and unlock withdrawals.</div>
+                    <button class="pr-action" onclick="switchView('plans')"><i class="fa-solid fa-rocket"></i> Browse Plans</button>
                 </div>
             </div>
 
@@ -3149,6 +3200,9 @@ function syncUserData(phone) {
         renderCheckinGrid();
         renderBankBindCard();
         autofillWithdrawFromBank();
+        // Keep the withdraw view's plan-required banner in sync whenever
+        // the user's investments change (e.g. they buy or finish a plan).
+        if (typeof applyPlanRequiredUI === 'function') applyPlanRequiredUI();
     });
 }
 
@@ -3967,10 +4021,11 @@ function submitDeposit(ref) {
 }
 
 // ==== BANK BINDING & TIME LOCK ====
-// Ethiopia is in EAT (UTC+3, no DST). Restriction: 23:00 – 03:00 EAT.
+// Ethiopia is in EAT (UTC+3, no DST). Restriction: 11:00 AM – 03:00 AM EAT.
+// Allowed withdrawal window: 03:00 AM – 11:00 AM EAT.
 const WD_TZ = 'Africa/Addis_Ababa';
-const WD_LOCK_START_HOUR = 23; // 11 PM
-const WD_LOCK_END_HOUR   = 3;  // 3 AM (next day)
+const WD_LOCK_START_HOUR = 11; // 11 AM — withdrawals LOCK at this hour
+const WD_LOCK_END_HOUR   = 3;  // 3 AM (next day) — withdrawals REOPEN at this hour
 
 function getEthiopiaParts() {
     // Intl-based timezone conversion. Returns { hour, minute, second, year, month, day, date } in EAT.
@@ -3997,7 +4052,8 @@ function getEthiopiaParts() {
 
 function isWithdrawalTimeLocked() {
     const h = getEthiopiaParts().hour;
-    // Locked from 23:00 inclusive to 03:00 exclusive.
+    // Locked from 11:00 (inclusive) to 03:00 (exclusive).
+    // Allowed window: 03:00 AM – 11:00 AM EAT.
     return h >= WD_LOCK_START_HOUR || h < WD_LOCK_END_HOUR;
 }
 
@@ -4019,7 +4075,7 @@ function getNextUnlockMs() {
     const tzOffsetMin = 3 * 60;
     let targetYear = p.year, targetMonth = p.month, targetDay = p.day;
     if (p.hour >= WD_LOCK_START_HOUR) {
-        // After 23:00 -> next day's 03:00
+        // 11:00 or later -> next day's 03:00 (the next time withdrawals reopen)
         const next = new Date(Date.UTC(p.year, p.month - 1, p.day));
         next.setUTCDate(next.getUTCDate() + 1);
         targetYear = next.getUTCFullYear();
@@ -4064,7 +4120,14 @@ function applyTimeLockUI() {
     } else {
         if (banner) banner.style.display = 'none';
         if (form) form.classList.remove('locked');
-        if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+        // Only re-enable the submit button if the user also has an active
+        // investment plan. applyPlanRequiredUI owns the "no active plan"
+        // lock — we must not re-enable the button from here and silently
+        // bypass that rule.
+        if (btn && typeof hasActivePlan === 'function' && hasActivePlan()) {
+            btn.disabled = false;
+            btn.style.opacity = '';
+        }
         if (_timeLockTimer) { clearInterval(_timeLockTimer); _timeLockTimer = null; }
     }
 }
@@ -4083,6 +4146,43 @@ function tickTimeLockCountdown() {
 function showTimeLockModal() {
     tickTimeLockCountdown();
     document.getElementById('timeLockModal').style.display = 'flex';
+}
+
+// ==== INVESTMENT PLAN REQUIREMENT ====
+// Rule: the user must have at least one ACTIVE investment plan before they
+// can submit a withdrawal. Completed (finished) plans do NOT unlock
+// withdrawals — the plan must still be running.
+function hasActivePlan() {
+    if (!state.investments || !Array.isArray(state.investments) || state.investments.length === 0) {
+        return false;
+    }
+    return state.investments.some(function (inv) {
+        return inv && inv.status === 'active';
+    });
+}
+
+// Reflects the plan-required rule in the withdraw view: shows the banner and
+// disables the submit button when the user has no active plan. Always
+// respects the time-lock state so we never accidentally enable the button
+// during the 11:00–03:00 EAT lockout window.
+function applyPlanRequiredUI() {
+    const banner = document.getElementById('planRequiredBanner');
+    const btn = document.getElementById('wdSubmitBtn');
+    if (!banner || !btn) return;
+
+    const ok = hasActivePlan();
+    if (ok) {
+        banner.style.display = 'none';
+        // Only re-enable the button if the time-lock window is also closed.
+        if (typeof isWithdrawalTimeLocked === 'function' && !isWithdrawalTimeLocked()) {
+            btn.disabled = false;
+            btn.style.opacity = '';
+        }
+    } else {
+        banner.style.display = 'flex';
+        btn.disabled = true;
+        btn.style.opacity = '0.55';
+    }
 }
 
 // ---- Bank binding ----
@@ -4257,7 +4357,15 @@ function onWithdrawFieldsChange() {
 }
 
 function submitWithdraw() {
-    // 1) Time-lock guard: 11 PM – 3 AM Ethiopia time
+    // 0) Active investment plan guard — must have at least one active plan.
+    // Checked FIRST so the user is told the most fundamental requirement
+    // before we get into time-locks, bank binding, etc.
+    if (!hasActivePlan()) {
+        document.getElementById('planRequiredModal').style.display = 'flex';
+        return;
+    }
+
+    // 1) Time-lock guard: 11:00 AM – 3:00 AM Ethiopia time (allowed: 3:00 AM – 11:00 AM)
     if (isWithdrawalTimeLocked()) {
         tickTimeLockCountdown();
         document.getElementById('timeLockModal').style.display = 'flex';
@@ -4972,6 +5080,7 @@ function switchView(viewId) {
         applyWithdrawBankFieldsVisibility();
         updateWithdrawBreakdown();
         applyTimeLockUI();
+        applyPlanRequiredUI();
     }
 }
 
