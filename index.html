@@ -2114,7 +2114,7 @@
         <i class="fa-solid fa-moon" style="font-size: 3.5rem; color: #b45309; margin-bottom: 12px;"></i>
         <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">Withdrawals are paused</h2>
         <p style="color: var(--text-muted); font-size: 0.88rem; font-weight: 600; margin-bottom: 14px;">
-            For your safety, withdrawals are only allowed between <b>3:00 AM</b> and <b>11:00 AM</b> Ethiopian time.
+            For your safety, withdrawals are only allowed between <b>9:00 AM</b> and <b>5:00 PM</b> Ethiopian time.
         </p>
         <div style="background: #fef3c7; border-radius: 10px; padding: 12px; font-family: 'Courier New', monospace; font-weight: 800; color: #92400e; margin-bottom: 18px; font-size: 1.05rem;" id="timeLockModalCountdown">
             Reopens in --:--:--
@@ -2526,12 +2526,12 @@
                 <!-- Filled by renderBankBindCard() -->
             </div>
 
-            <!-- ===== TIME LOCK BANNER (visible only during 11:00–03:00 EAT) ===== -->
+            <!-- ===== TIME LOCK BANNER (visible only during 17:00–09:00 EAT) ===== -->
             <div id="timeLockBanner" class="time-lock-banner" style="display: none;">
                 <i class="fa-solid fa-moon"></i>
                 <div style="flex:1;">
                     <div class="tl-title"><i class="fa-solid fa-lock"></i> Withdrawals are paused</div>
-                    <div>Withdrawals are only allowed between <b>3:00 AM</b> and <b>11:00 AM</b> Ethiopian time. The current window is closed — please come back during the allowed hours.</div>
+                    <div>Withdrawals are only allowed between <b>9:00 AM</b> and <b>5:00 PM</b> Ethiopian time. The current window is closed — please come back during the allowed hours.</div>
                     <div class="tl-countdown" id="timeLockCountdown">Reopens in --:--:--</div>
                 </div>
             </div>
@@ -4021,11 +4021,11 @@ function submitDeposit(ref) {
 }
 
 // ==== BANK BINDING & TIME LOCK ====
-// Ethiopia is in EAT (UTC+3, no DST). Restriction: 11:00 AM – 03:00 AM EAT.
-// Allowed withdrawal window: 03:00 AM – 11:00 AM EAT.
+// Ethiopia is in EAT (UTC+3, no DST). Restriction: 5:00 PM – 9:00 AM EAT.
+// Allowed withdrawal window: 9:00 AM – 5:00 PM EAT.
 const WD_TZ = 'Africa/Addis_Ababa';
-const WD_LOCK_START_HOUR = 11; // 11 AM — withdrawals LOCK at this hour
-const WD_LOCK_END_HOUR   = 3;  // 3 AM (next day) — withdrawals REOPEN at this hour
+const WD_LOCK_START_HOUR = 17; // 5 PM (17:00) — withdrawals LOCK at this hour
+const WD_LOCK_END_HOUR   = 9;  // 9 AM (09:00) — withdrawals REOPEN at this hour
 
 function getEthiopiaParts() {
     // Intl-based timezone conversion. Returns { hour, minute, second, year, month, day, date } in EAT.
@@ -4052,8 +4052,8 @@ function getEthiopiaParts() {
 
 function isWithdrawalTimeLocked() {
     const h = getEthiopiaParts().hour;
-    // Locked from 11:00 (inclusive) to 03:00 (exclusive).
-    // Allowed window: 03:00 AM – 11:00 AM EAT.
+    // Locked from 17:00 (inclusive) to 09:00 (exclusive).
+    // Allowed window: 9:00 AM – 5:00 PM EAT.
     return h >= WD_LOCK_START_HOUR || h < WD_LOCK_END_HOUR;
 }
 
@@ -4075,14 +4075,14 @@ function getNextUnlockMs() {
     const tzOffsetMin = 3 * 60;
     let targetYear = p.year, targetMonth = p.month, targetDay = p.day;
     if (p.hour >= WD_LOCK_START_HOUR) {
-        // 11:00 or later -> next day's 03:00 (the next time withdrawals reopen)
+        // 17:00 or later -> next day's 09:00 (the next time withdrawals reopen)
         const next = new Date(Date.UTC(p.year, p.month - 1, p.day));
         next.setUTCDate(next.getUTCDate() + 1);
         targetYear = next.getUTCFullYear();
         targetMonth = next.getUTCMonth() + 1;
         targetDay = next.getUTCDate();
     }
-    // 03:00 EAT on target day
+    // 09:00 EAT on target day
     const targetUtcMs = Date.UTC(targetYear, targetMonth - 1, targetDay, WD_LOCK_END_HOUR, 0, 0);
     return targetUtcMs - (tzOffsetMin - new Date(targetUtcMs).getTimezoneOffset()) * 60 * 1000;
 }
@@ -4164,7 +4164,7 @@ function hasActivePlan() {
 // Reflects the plan-required rule in the withdraw view: shows the banner and
 // disables the submit button when the user has no active plan. Always
 // respects the time-lock state so we never accidentally enable the button
-// during the 11:00–03:00 EAT lockout window.
+// during the 17:00–09:00 EAT lockout window.
 function applyPlanRequiredUI() {
     const banner = document.getElementById('planRequiredBanner');
     const btn = document.getElementById('wdSubmitBtn');
@@ -4365,7 +4365,7 @@ function submitWithdraw() {
         return;
     }
 
-    // 1) Time-lock guard: 11:00 AM – 3:00 AM Ethiopia time (allowed: 3:00 AM – 11:00 AM)
+    // 1) Time-lock guard: 5:00 PM – 9:00 AM Ethiopia time (allowed: 9:00 AM – 5:00 PM)
     if (isWithdrawalTimeLocked()) {
         tickTimeLockCountdown();
         document.getElementById('timeLockModal').style.display = 'flex';
