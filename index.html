@@ -2498,39 +2498,41 @@
             <div id="withdrawForm">
             <div class="min-info" id="wdMinInfo">
                 <i class="fa-solid fa-circle-info"></i>
-                <span>Minimum withdrawal: <b>ETB <span id="wdMinDisplay">100</span></b> · Fee: <b><span id="wdFeePctDisplay">18</span>%</b></span>
+                <span>Minimum withdrawal: <b>ETB <span id="wdMinDisplay">100</span></b> · Platform fee is deducted from the withdrawal amount.</span>
             </div>
             <div class="fee-info" id="wdFeeBreakdown">
                 <div class="fee-row"><span>You will receive</span><b>ETB <span id="wdNetAmount">0.00</span></b></div>
                 <div class="fee-row"><span>Platform fee (<span id="wdFeePctBreakdown">18</span>%)</span><span>ETB <span id="wdFeeAmount">0.00</span></span></div>
-                <div class="fee-row total"><span>Total deducted from balance</span><b>ETB <span id="wdTotalDeduct">0.00</span></b></div>
+                <div class="fee-row total"><span>Deducted from your balance</span><b>ETB <span id="wdTotalDeduct">0.00</span></b></div>
             </div>
             <div class="input-group">
-                <label>Amount to receive (ETB)</label>
+                <label>Withdrawal amount (ETB)</label>
                 <input type="number" id="wdAmount" placeholder="Enter amount" min="100" oninput="updateWithdrawBreakdown()">
             </div>
-            <div class="input-group">
-                <label>Withdraw To</label>
-                <select id="wdMethod" onchange="onWithdrawMethodChange()">
-                    <option value="telebirr">Telebirr</option>
-                    <option value="cbe">CBE Birr</option>
-                    <option value="awash">Awash Bank</option>
-                    <option value="boa">Bank of Abyssinia</option>
-                    <option value="bankcard">Bank Card</option>
-                </select>
-            </div>
-            <div class="saved-account-badge hidden" id="savedAccountBadge">
-                <i class="fa-solid fa-bookmark"></i>
-                <span>Saved: <b id="savedAccountSummary">—</b></span>
-                <span class="forget" onclick="forgetSavedAccount()"><i class="fa-solid fa-trash-can"></i> Forget</span>
-            </div>
-            <div class="input-group">
-                <label>Account Number</label>
-                <input type="text" id="wdAccount" placeholder="Enter account number" oninput="onWithdrawFieldsChange()">
-            </div>
-            <div class="input-group">
-                <label>Account Name</label>
-                <input type="text" id="wdName" placeholder="Name on account" oninput="onWithdrawFieldsChange()">
+            <div id="wdBankFields">
+                <div class="input-group">
+                    <label>Withdraw To</label>
+                    <select id="wdMethod" onchange="onWithdrawMethodChange()">
+                        <option value="telebirr">Telebirr</option>
+                        <option value="cbe">CBE Birr</option>
+                        <option value="awash">Awash Bank</option>
+                        <option value="boa">Bank of Abyssinia</option>
+                        <option value="bankcard">Bank Card</option>
+                    </select>
+                </div>
+                <div class="saved-account-badge hidden" id="savedAccountBadge">
+                    <i class="fa-solid fa-bookmark"></i>
+                    <span>Saved: <b id="savedAccountSummary">—</b></span>
+                    <span class="forget" onclick="forgetSavedAccount()"><i class="fa-solid fa-trash-can"></i> Forget</span>
+                </div>
+                <div class="input-group">
+                    <label>Account Number</label>
+                    <input type="text" id="wdAccount" placeholder="Enter account number" oninput="onWithdrawFieldsChange()">
+                </div>
+                <div class="input-group">
+                    <label>Account Name</label>
+                    <input type="text" id="wdName" placeholder="Name on account" oninput="onWithdrawFieldsChange()">
+                </div>
             </div>
             <button class="btn-full primary" id="wdSubmitBtn" onclick="submitWithdraw()"><i class="fa-solid fa-money-bill-wave"></i> Request Withdrawal</button>
             </div><!-- /#withdrawForm -->
@@ -4154,6 +4156,7 @@ function submitBindBank() {
         if (wdNm)  wdNm.value  = name;
 
         renderBankBindCard();
+        if (typeof applyWithdrawBankFieldsVisibility === 'function') applyWithdrawBankFieldsVisibility();
         showSuccessModal('Bank Bound', `Your ${payload.methodLabel} account ending in ${account.slice(-4)} is now linked.`);
         closeBindBankModal();
     }).catch((err) => {
@@ -4219,13 +4222,28 @@ function autofillWithdrawFromBank() {
 }
 
 // ==== WITHDRAWAL LOGIC ====
+// Show / hide the bank fields based on whether the user has a bound bank.
+// Once a bank is bound, only the withdrawal amount is needed.
+function applyWithdrawBankFieldsVisibility() {
+    const wrap = document.getElementById('wdBankFields');
+    if (!wrap) return;
+    if (hasBoundBank()) {
+        wrap.style.display = 'none';
+    } else {
+        wrap.style.display = 'block';
+    }
+}
+
 function updateWithdrawBreakdown() {
     const amount = parseFloat(document.getElementById('wdAmount').value) || 0;
     const feePct = APP_SETTINGS.withdrawFeePercent;
+    // Fee is deducted FROM the entered withdrawal amount.
+    // The full entered amount is taken from the user's balance.
     const feeAmount = (feePct / 100) * amount;
-    const totalDeduct = amount + feeAmount;
+    const netReceived = Math.max(0, amount - feeAmount);
+    const totalDeduct = amount; // only the entered amount is deducted from balance
 
-    document.getElementById('wdNetAmount').innerText = amount.toFixed(2);
+    document.getElementById('wdNetAmount').innerText = netReceived.toFixed(2);
     document.getElementById('wdFeeAmount').innerText = feeAmount.toFixed(2);
     document.getElementById('wdTotalDeduct').innerText = totalDeduct.toFixed(2);
 }
@@ -4252,36 +4270,37 @@ function submitWithdraw() {
         return;
     }
 
+    const ba = (state.user && state.user.bankAccount) ? state.user.bankAccount : null;
     const amount = parseFloat(document.getElementById('wdAmount').value) || 0;
-    const method = document.getElementById('wdMethod').value;
-    const acc = document.getElementById('wdAccount').value.trim();
-    const name = document.getElementById('wdName').value.trim();
 
     if (amount < APP_SETTINGS.minWithdraw) {
         showToast(`Minimum withdrawal is ETB ${APP_SETTINGS.minWithdraw}`);
         return;
     }
 
+    // Only the entered amount is deducted from balance. The platform fee
+    // comes out of the withdrawal amount itself — the user receives the rest.
+    if (state.balance < amount) {
+        showToast("Insufficient balance for this withdrawal!");
+        return;
+    }
+
     const fee = (APP_SETTINGS.withdrawFeePercent / 100) * amount;
-    const totalRequired = amount + fee;
+    const netReceived = Math.max(0, amount - fee);
 
-    if (state.balance < totalRequired) {
-        showToast("Insufficient balance for withdrawal and platform fees!");
-        return;
-    }
-
-    if (!acc || !name) {
-        showToast("Please fill account details!");
-        return;
-    }
+    // Use the bound bank account details (no manual entry required).
+    const method = ba.method;
+    const acc = ba.account;
+    const name = ba.name;
 
     const txnId = db.ref().child(`users/${state.user.phone}/transactions`).push().key;
     const withdrawTxn = {
         id: txnId,
         type: 'withdrawal',
-        title: `Withdrawal (${METHOD_LABELS[method]})`,
-        amount: amount,
-        fee: fee,
+        title: `Withdrawal (${METHOD_LABELS[method] || method})`,
+        amount: amount,           // amount the user requested
+        fee: fee,                 // platform fee (deducted from amount)
+        netReceived: netReceived, // what the user actually receives
         account: acc,
         accountName: name,
         accountMethod: method,
@@ -4289,14 +4308,16 @@ function submitWithdraw() {
         status: 'pending'
     };
 
-    const newBalance = state.balance - totalRequired;
+    const newBalance = state.balance - amount;
 
     db.ref(`users/${state.user.phone}/balance`).set(newBalance);
     db.ref(`users/${state.user.phone}/transactions/${txnId}`).set(withdrawTxn).then(() => {
-        showSuccessModal("Withdrawal Processed", `Request of ETB ${amount} sent successfully. Standard administrative checks apply.`);
+        showSuccessModal(
+            "Withdrawal Requested",
+            `You'll receive ETB ${netReceived.toFixed(2)} (ETB ${amount.toFixed(2)} − ETB ${fee.toFixed(2)} fee). Standard admin checks apply.`
+        );
         document.getElementById('wdAmount').value = '';
-        document.getElementById('wdAccount').value = '';
-        document.getElementById('wdName').value = '';
+        updateWithdrawBreakdown();
         switchView('home');
     });
 }
@@ -4756,6 +4777,20 @@ function renderTransactions() {
             const refLine = t.ref ? `<div class="txn-card-meta" style="margin-top:2px; font-family: 'Courier New', monospace; color: var(--text-soft);">${escapeHtml(t.ref.length > 32 ? t.ref.slice(0, 32) + '\u2026' : t.ref)}</div>` : '';
             const metaTime = new Date(t.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+            // For withdrawals, the user actually receives (amount - fee).
+            // Show the net amount and a small fee note so they aren't surprised.
+            let amtNum = Math.abs(t.amount || 0);
+            let amtLbl = 'ETB';
+            let feeNote = '';
+            if (cat === 'withdraw') {
+                const fee = t.fee || 0;
+                const net = (typeof t.netReceived === 'number') ? t.netReceived : Math.max(0, (t.amount || 0) - fee);
+                amtNum = net;
+                if (fee > 0) {
+                    feeNote = `<div class="txn-card-meta" style="margin-top:2px; color: var(--text-muted);">Fee: ETB ${fee.toFixed(2)}</div>`;
+                }
+            }
+
             html += `
             <div class="txn-card-v2 ${cat}">
                 <div class="txn-card-icon"><i class="fa-solid ${icon}"></i></div>
@@ -4767,10 +4802,11 @@ function renderTransactions() {
                         <span>${metaTime}</span>
                     </div>
                     ${refLine}
+                    ${feeNote}
                 </div>
                 <div class="txn-card-amt">
-                    <div class="num">${sign}${Math.abs(t.amount || 0).toFixed(2)}</div>
-                    <div class="lbl">ETB</div>
+                    <div class="num">${sign}${amtNum.toFixed(2)}</div>
+                    <div class="lbl">${amtLbl}</div>
                 </div>
             </div>`;
         });
@@ -4933,6 +4969,8 @@ function switchView(viewId) {
     if (viewId === 'withdraw') {
         renderBankBindCard();
         autofillWithdrawFromBank();
+        applyWithdrawBankFieldsVisibility();
+        updateWithdrawBreakdown();
         applyTimeLockUI();
     }
 }
@@ -5012,7 +5050,11 @@ function renderAdminContent() {
             html += `<div style="text-align:center; padding:40px; color:var(--text-muted);">No pending withdrawal requests.</div>`;
         } else {
             pending.forEach(p => {
-                const totalWithFee = p.amount + (p.fee || 0);
+                // New model: fee is deducted FROM the entered amount, so the
+                // net amount the user actually receives is (amount - fee).
+                // The full `amount` is what was deducted from the user's balance.
+                const fee = p.fee || 0;
+                const net = (typeof p.netReceived === 'number') ? p.netReceived : Math.max(0, p.amount - fee);
                 html += `
                 <div class="admin-req-card">
                     <div class="admin-req-head">
@@ -5023,18 +5065,19 @@ function renderAdminContent() {
                                 <div class="admin-req-phone">+251 ${p.user.phone}</div>
                             </div>
                         </div>
-                        <div class="admin-req-amount out">-ETB ${totalWithFee.toFixed(2)}</div>
+                        <div class="admin-req-amount out">Send ETB ${net.toFixed(2)}</div>
                     </div>
                     <div class="admin-req-meta">
-                        <div>Send Net Amount: <b style="color:var(--primary-dark); font-size:0.95rem;">ETB ${p.amount.toFixed(2)}</b></div>
-                        <div>Platform Fee Deducted: <b>ETB ${(p.fee || 0).toFixed(2)} (${APP_SETTINGS.withdrawFeePercent}%)</b></div>
+                        <div>Send (Net) to user: <b style="color:var(--primary-dark); font-size:0.95rem;">ETB ${net.toFixed(2)}</b></div>
+                        <div>Platform Fee Deducted: <b>ETB ${fee.toFixed(2)} (${APP_SETTINGS.withdrawFeePercent}%)</b></div>
+                        <div>Total Deducted from Balance: <b>ETB ${p.amount.toFixed(2)}</b></div>
                         <div>Method: <b>${p.title}</b></div>
                         <div>Account: <b>${p.account} (${p.accountName})</b></div>
                         <div>Date: <b>${new Date(p.date).toLocaleString()}</b></div>
                     </div>
                     <div class="admin-req-actions">
                         <button class="admin-btn approve" onclick="adminApproveWithdrawal('${p.user.phone}', '${p.id}')">Confirm Paid</button>
-                        <button class="admin-btn reject" onclick="adminRejectWithdrawal('${p.user.phone}', '${p.id}', ${totalWithFee})">Decline & Refund</button>
+                        <button class="admin-btn reject" onclick="adminRejectWithdrawal('${p.user.phone}', '${p.id}', ${p.amount})">Decline & Refund</button>
                     </div>
                 </div>
                 `;
