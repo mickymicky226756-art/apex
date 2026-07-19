@@ -1902,6 +1902,172 @@
         }
         .di-status-badge.released { background: #dcfce7; color: #15803d; }
         .di-status-badge.pending  { background: #fef3c7; color: #b45309; }
+
+        /* ---------- FULL ADMIN: ANALYTICS, MODALS, SEARCH, LEADERBOARD ---------- */
+        .admin-search-bar {
+            display: flex; gap: 8px; margin-bottom: 14px;
+            background: white; padding: 8px; border-radius: 12px;
+            border: 1px solid var(--border-soft);
+        }
+        .admin-search-bar input {
+            flex: 1; border: none; outline: none; padding: 10px 12px;
+            background: #f8fafc; border-radius: 8px; font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .admin-search-bar input:focus { background: white; box-shadow: 0 0 0 2px var(--primary-light); }
+
+        .an-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px; margin-bottom: 18px;
+        }
+        .an-card {
+            background: white; border: 1px solid var(--border-soft);
+            border-radius: 14px; padding: 14px;
+            box-shadow: var(--shadow-soft);
+            position: relative; overflow: hidden;
+        }
+        .an-card .an-label {
+            font-size: 0.7rem; color: var(--text-muted); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .an-card .an-value {
+            font-size: 1.35rem; font-weight: 800; color: var(--text-main);
+            margin-top: 4px; letter-spacing: -0.3px;
+        }
+        .an-card .an-sub { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+        .an-card.accent-green { background: linear-gradient(135deg, #dcfce7, #f0fdf4); border-color: #bbf7d0; }
+        .an-card.accent-blue  { background: linear-gradient(135deg, #dbeafe, #eff6ff); border-color: #bfdbfe; }
+        .an-card.accent-amber { background: linear-gradient(135deg, #fef3c7, #fffbeb); border-color: #fde68a; }
+        .an-card.accent-red   { background: linear-gradient(135deg, #fee2e2, #fef2f2); border-color: #fecaca; }
+        .an-card.accent-violet{ background: linear-gradient(135deg, #ede9fe, #f5f3ff); border-color: #ddd6fe; }
+
+        .an-chart {
+            background: white; border: 1px solid var(--border-soft);
+            border-radius: 14px; padding: 16px;
+            box-shadow: var(--shadow-soft); margin-bottom: 14px;
+        }
+        .an-chart h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 12px; color: var(--text-main); }
+        .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.75rem; }
+        .bar-row .bar-day { width: 64px; color: var(--text-muted); font-weight: 700; flex-shrink: 0; }
+        .bar-row .bar-track {
+            flex: 1; background: #f1f5f9; height: 18px; border-radius: 6px; overflow: hidden;
+        }
+        .bar-row .bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 6px; }
+        .bar-row .bar-fill.in { background: linear-gradient(90deg, #34d399, #059669); }
+        .bar-row .bar-fill.out { background: linear-gradient(90deg, #f87171, #dc2626); }
+        .bar-row .bar-amt { width: 90px; text-align: right; font-weight: 800; color: var(--text-main); }
+
+        .leader-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 0; border-bottom: 1px solid var(--border-soft);
+        }
+        .leader-row:last-child { border-bottom: none; }
+        .leader-rank {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: #f1f5f9; color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.78rem; flex-shrink: 0;
+        }
+        .leader-rank.gold   { background: #fef3c7; color: #b45309; }
+        .leader-rank.silver { background: #e2e8f0; color: #475569; }
+        .leader-rank.bronze { background: #fde68a; color: #92400e; }
+        .leader-info { flex: 1; min-width: 0; }
+        .leader-name { font-weight: 800; font-size: 0.85rem; color: var(--text-main); }
+        .leader-phone { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+        .leader-amt { font-weight: 800; color: var(--primary-dark); font-size: 0.9rem; }
+
+        .user-row-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+        .user-row-actions .admin-btn { padding: 8px 10px; font-size: 0.72rem; }
+        .user-status-pill {
+            display: inline-block; padding: 2px 8px; border-radius: 20px;
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+            margin-left: 6px;
+        }
+        .user-status-pill.active { background: #dcfce7; color: #15803d; }
+        .user-status-pill.banned { background: #fee2e2; color: #b91c1c; }
+
+        .broadcast-card {
+            background: white; border: 1px solid var(--border-soft);
+            border-radius: 14px; padding: 14px;
+            box-shadow: var(--shadow-soft); margin-bottom: 12px;
+        }
+        .broadcast-card .b-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
+        .broadcast-card .b-text {
+            margin-top: 8px; padding: 10px; background: #f8fafc;
+            border-radius: 8px; font-size: 0.85rem; color: var(--text-main);
+            white-space: pre-wrap; word-break: break-word;
+        }
+
+        .admin-log-row {
+            display: flex; gap: 10px; padding: 10px 0;
+            border-bottom: 1px solid var(--border-soft); font-size: 0.8rem;
+        }
+        .admin-log-row:last-child { border-bottom: none; }
+        .admin-log-time { color: var(--text-muted); font-weight: 600; white-space: nowrap; font-size: 0.72rem; }
+        .admin-log-text { flex: 1; }
+        .admin-log-text b { color: var(--text-main); }
+        .admin-log-text .tag {
+            display: inline-block; padding: 1px 6px; border-radius: 6px;
+            background: var(--primary-light); color: var(--primary-dark);
+            font-size: 0.65rem; font-weight: 800; margin-right: 4px;
+        }
+
+        .admin-modal-backdrop {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; padding: 16px;
+        }
+        .admin-modal {
+            background: white; border-radius: 18px;
+            max-width: 520px; width: 100%; max-height: 88vh;
+            overflow-y: auto; padding: 20px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.3);
+            animation: slideUp 0.25s ease-out;
+        }
+        .admin-modal h3 {
+            font-size: 1.05rem; font-weight: 800; margin-bottom: 14px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .admin-modal .close-x {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #f1f5f9; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; color: var(--text-muted);
+        }
+        .admin-modal .close-x:hover { background: #e2e8f0; color: var(--text-main); }
+
+        .user-stat-row {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 8px; margin: 12px 0;
+        }
+        .user-stat-row .us {
+            background: #f8fafc; padding: 10px; border-radius: 10px;
+            text-align: center;
+        }
+        .user-stat-row .us .l { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .user-stat-row .us .v { font-size: 0.95rem; font-weight: 800; color: var(--text-main); margin-top: 2px; }
+
+        .toggle-switch {
+            position: relative; display: inline-block;
+            width: 44px; height: 24px; vertical-align: middle;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-switch .slider {
+            position: absolute; cursor: pointer; inset: 0;
+            background: #cbd5e1; border-radius: 24px; transition: 0.2s;
+        }
+        .toggle-switch .slider:before {
+            content: ""; position: absolute; height: 18px; width: 18px;
+            left: 3px; bottom: 3px; background: white; border-radius: 50%;
+            transition: 0.2s;
+        }
+        .toggle-switch input:checked + .slider { background: var(--primary); }
+        .toggle-switch input:checked + .slider:before { transform: translateX(20px); }
+
+        .admin-row-flex { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-soft); }
+        .admin-row-flex:last-child { border-bottom: none; }
+        .admin-row-flex .label-block b { display: block; font-size: 0.85rem; color: var(--text-main); }
+        .admin-row-flex .label-block span { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
         .di-status-badge.empty    { background: #f1f5f9; color: var(--text-soft); }
 
         .di-plan-stats {
@@ -2940,13 +3106,17 @@
         </div>
 
         <div class="admin-tab-bar">
-            <div class="txn-tab active" data-admin-tab="deposits" onclick="switchAdminTab('deposits', this)"><i class="fa-solid fa-circle-arrow-down"></i> Deposits</div>
+            <div class="txn-tab active" data-admin-tab="analytics" onclick="switchAdminTab('analytics', this)"><i class="fa-solid fa-chart-line"></i> Analytics</div>
+            <div class="txn-tab" data-admin-tab="deposits" onclick="switchAdminTab('deposits', this)"><i class="fa-solid fa-circle-arrow-down"></i> Deposits</div>
             <div class="txn-tab" data-admin-tab="withdrawals" onclick="switchAdminTab('withdrawals', this)"><i class="fa-solid fa-circle-arrow-up"></i> Withdrawals</div>
             <div class="txn-tab" data-admin-tab="daily" onclick="switchAdminTab('daily', this)"><i class="fa-solid fa-coins"></i> Daily</div>
             <div class="txn-tab" data-admin-tab="users" onclick="switchAdminTab('users', this)"><i class="fa-solid fa-users"></i> Users</div>
+            <div class="txn-tab" data-admin-tab="topusers" onclick="switchAdminTab('topusers', this)"><i class="fa-solid fa-trophy"></i> Top</div>
             <div class="txn-tab" data-admin-tab="plans" onclick="switchAdminTab('plans', this)"><i class="fa-solid fa-chart-pie"></i> Plans</div>
             <div class="txn-tab" data-admin-tab="paymentmethods" onclick="switchAdminTab('paymentmethods', this)"><i class="fa-solid fa-building-columns"></i> Payments</div>
             <div class="txn-tab" data-admin-tab="transactions" onclick="switchAdminTab('transactions', this)"><i class="fa-solid fa-list"></i> All</div>
+            <div class="txn-tab" data-admin-tab="broadcasts" onclick="switchAdminTab('broadcasts', this)"><i class="fa-solid fa-bullhorn"></i> Broadcast</div>
+            <div class="txn-tab" data-admin-tab="activitylog" onclick="switchAdminTab('activitylog', this)"><i class="fa-solid fa-clipboard-list"></i> Log</div>
             <div class="txn-tab" data-admin-tab="settings" onclick="switchAdminTab('settings', this)"><i class="fa-solid fa-gear"></i> Settings</div>
             <div class="txn-tab" data-admin-tab="giftcodes" onclick="switchAdminTab('giftcodes', this)"><i class="fa-solid fa-ticket"></i> Codes</div>
         </div>
@@ -3288,11 +3458,15 @@ function login() {
 
     db.ref('users/' + phone).once('value', (snapshot) => {
         if (snapshot.exists() && snapshot.val().password === pass) {
+            // Block banned users
+            if (snapshot.val().status === 'banned') {
+                showToast('Your account has been suspended. Contact support.');
+                return;
+            }
             localStorage.setItem('userPhone', phone);
             localStorage.setItem('isAdmin', 'false');
             document.getElementById('authModal').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            showToast("Welcome back!");
+            document.getElementById('app').style.display = 'block';            showToast("Welcome back!");
             // Reset promo flag so it pops on each fresh login
             try { sessionStorage.removeItem('welcomePromoShown'); } catch (e) {}
             syncUserData(phone);
@@ -3311,6 +3485,11 @@ function signup() {
 
     if (!name || !phone || !pass) {
         showToast("Please fill all fields!");
+        return;
+    }
+
+    if (APP_SETTINGS && APP_SETTINGS.maintenanceMode) {
+        showToast("Registrations are temporarily disabled. Please try again later.");
         return;
     }
 
@@ -5093,10 +5272,10 @@ function switchView(viewId) {
 }
 
 // ==== ADMINISTRATIVE UI NAVIGATION ====
-let activeAdminTab = 'deposits';
+let activeAdminTab = 'analytics';
 function switchAdminTab(tab, btn) {
     document.querySelectorAll('.admin-tab-bar .txn-tab').forEach(el => el.classList.remove('active'));
-    btn.classList.add('active');
+    if (btn) btn.classList.add('active');
     activeAdminTab = tab;
     renderAdminContent();
 }
@@ -5105,7 +5284,10 @@ function renderAdminContent() {
     const container = document.getElementById('adminContent');
     if (!container) return;
 
-    if (activeAdminTab === 'deposits') {
+    if (activeAdminTab === 'analytics') {
+        renderAdminAnalytics();
+    }
+    else if (activeAdminTab === 'deposits') {
         let html = '<h3 style="font-size:1rem; font-weight:800; margin-bottom:12px; text-transform:uppercase;">Pending Deposits</h3>';
         let pending = [];
         allUsersCache.forEach(u => {
@@ -5244,31 +5426,22 @@ function renderAdminContent() {
         }
         container.innerHTML = html;
     } 
-    
+
     else if (activeAdminTab === 'users') {
-        let html = '<h3 style="font-size:1rem; font-weight:800; margin-bottom:12px; text-transform:uppercase;">Manage Users</h3>';
-        allUsersCache.forEach(u => {
-            html += `
-            <div class="admin-req-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div>
-                        <b style="font-size:0.95rem;">${u.name}</b>
-                        <div style="font-size:0.72rem; color:var(--text-muted);">+251 ${u.phone}</div>
-                    </div>
-                    <div style="font-weight:800; font-size:1.1rem; color:var(--primary-dark)">ETB ${u.balance.toFixed(2)}</div>
-                </div>
-                <div class="plan-form-grid" style="margin-top:12px;">
-                    <div class="input-group" style="grid-column: 1/-1; display:flex; gap:6px;">
-                        <input type="number" id="balModAmt_${u.phone}" placeholder="Amount (ETB)" style="padding:10px;">
-                        <button class="admin-btn approve" style="padding:10px;" onclick="adminModifyUserBalance('${u.phone}', 'add')">+</button>
-                        <button class="admin-btn reject" style="padding:10px;" onclick="adminModifyUserBalance('${u.phone}', 'sub')">-</button>
-                    </div>
-                </div>
-            </div>
-            `;
-        });
-        container.innerHTML = html;
-    } 
+        renderAdminUsers();
+    }
+
+    else if (activeAdminTab === 'topusers') {
+        renderAdminTopUsers();
+    }
+
+    else if (activeAdminTab === 'broadcasts') {
+        renderAdminBroadcasts();
+    }
+
+    else if (activeAdminTab === 'activitylog') {
+        renderAdminActivityLog();
+    }
     
     else if (activeAdminTab === 'plans') {
         renderAdminPlans();
@@ -5311,7 +5484,22 @@ function renderAdminContent() {
     else if (activeAdminTab === 'settings') {
         const tgChannel = APP_SETTINGS.telegramChannel || '';
         const tgSupport = APP_SETTINGS.telegramSupport || '';
+        const maintenance = !!(APP_SETTINGS && APP_SETTINGS.maintenanceMode);
         let html = `
+        <div class="settings-card">
+            <h4><i class="fa-solid fa-screwdriver-wrench" style="color:var(--primary);"></i> Site Control</h4>
+            <div class="admin-row-flex">
+                <div class="label-block">
+                    <b>Maintenance Mode</b>
+                    <span>When ON, regular users see a maintenance screen on login.</span>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="confMaintenance" ${maintenance ? 'checked' : ''} onchange="adminToggleMaintenance(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
         <div class="settings-card">
             <h4>Application Configurations</h4>
             <div class="plan-form-grid" style="margin-top:12px;">
@@ -5643,8 +5831,11 @@ function renderAdminPlans() {
                 <div class="admin-plan-body">
                     <p class="admin-plan-desc">${plan.desc || ''}</p>
                     <div class="admin-plan-actions">
+                        <button class="admin-btn outline" onclick="adminEditPlanPrompt('${plan.id}')">
+                            <i class="fa-solid fa-pen"></i> Edit
+                        </button>
                         <button class="admin-btn reject" onclick="adminDeletePlan('${plan.id}')">
-                            <i class="fa-solid fa-trash-can"></i> Delete Plan
+                            <i class="fa-solid fa-trash-can"></i> Delete
                         </button>
                     </div>
                 </div>
@@ -5989,6 +6180,676 @@ function copyText(val) {
         return false;
     }
 }
+
+// ============================================================
+// === FULL ADMIN PANEL: ANALYTICS, SEARCH, EDIT, BROADCASTS ===
+// ============================================================
+
+// Log every privileged admin action to /adminLog for auditability
+function adminLog(action, detail) {
+    const ref = db.ref('adminLog').push();
+    ref.set({
+        action: action,
+        detail: detail || '',
+        at: new Date().toISOString()
+    });
+}
+
+// ---------- ANALYTICS TAB ----------
+function renderAdminAnalytics() {
+    const container = document.getElementById('adminContent');
+    if (!container) return;
+
+    // Tally across all users from the cached snapshot
+    let totalDeposits = 0, totalWithdrawals = 0, totalInvested = 0;
+    let totalCommissions = 0, totalDailyIncome = 0;
+    let pendingDep = 0, pendingWd = 0;
+    let activeInvestors = 0, bannedCount = 0;
+
+    // Daily buckets for the last 14 days
+    const days = 14;
+    const today = new Date();
+    const dayKeys = [];
+    for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        dayKeys.push(d.toISOString().slice(0, 10));
+    }
+    const depByDay = Object.fromEntries(dayKeys.map(k => [k, 0]));
+    const wdByDay  = Object.fromEntries(dayKeys.map(k => [k, 0]));
+
+    allUsersCache.forEach(u => {
+        const banned = u.status === 'banned';
+        if (banned) bannedCount++;
+        const txns = u.transactions ? Object.values(u.transactions) : [];
+        txns.forEach(t => {
+            const day = (t.date || '').slice(0, 10);
+            if (t.type === 'deposit' && t.status === 'completed') {
+                totalDeposits += (t.amount || 0);
+                if (depByDay[day] !== undefined) depByDay[day] += (t.amount || 0);
+            }
+            if (t.type === 'withdrawal' && t.status === 'completed') {
+                totalWithdrawals += (t.amount || 0);
+                if (wdByDay[day] !== undefined) wdByDay[day] += (t.amount || 0);
+            }
+            if (t.type === 'withdrawal' && t.status === 'pending') pendingWd++;
+            if (t.type === 'deposit'    && t.status === 'pending') pendingDep++;
+            if (/Commission/i.test(t.title || '') && t.status === 'completed') {
+                totalCommissions += (t.amount || 0);
+            }
+            if (/Daily Release/i.test(t.title || '') && t.status === 'completed') {
+                totalDailyIncome += (t.amount || 0);
+            }
+        });
+        if (u.investments) {
+            const invs = Object.values(u.investments);
+            invs.forEach(inv => {
+                totalInvested += (inv.price || 0);
+                if (inv.status === 'active') activeInvestors++;
+            });
+        }
+    });
+
+    const maxDep = Math.max(1, ...Object.values(depByDay));
+    const maxWd  = Math.max(1, ...Object.values(wdByDay));
+
+    const barHtml = (data, max) => Object.entries(data).map(([day, amt]) => {
+        const pct = Math.max(2, Math.round((amt / max) * 100));
+        const label = day.slice(5); // MM-DD
+        return `<div class="bar-row">
+            <div class="bar-day">${label}</div>
+            <div class="bar-track"><div class="bar-fill in" style="width:${pct}%"></div></div>
+            <div class="bar-amt">ETB ${amt.toFixed(0)}</div>
+        </div>`;
+    }).join('');
+
+    const totalUsers = allUsersCache.length;
+
+    container.innerHTML = `
+    <h3 style="font-size:1rem; font-weight:800; margin-bottom:12px; text-transform:uppercase;">Platform Analytics</h3>
+    <div class="an-grid">
+        <div class="an-card accent-green">
+            <div class="an-label">Total Deposits</div>
+            <div class="an-value">ETB ${totalDeposits.toFixed(2)}</div>
+            <div class="an-sub">${pendingDep} pending</div>
+        </div>
+        <div class="an-card accent-red">
+            <div class="an-label">Total Withdrawals</div>
+            <div class="an-value">ETB ${totalWithdrawals.toFixed(2)}</div>
+            <div class="an-sub">${pendingWd} pending</div>
+        </div>
+        <div class="an-card accent-blue">
+            <div class="an-label">Total Invested</div>
+            <div class="an-value">ETB ${totalInvested.toFixed(2)}</div>
+            <div class="an-sub">${activeInvestors} active plans</div>
+        </div>
+        <div class="an-card accent-amber">
+            <div class="an-label">Commissions Paid</div>
+            <div class="an-value">ETB ${totalCommissions.toFixed(2)}</div>
+            <div class="an-sub">L1 + L2 + L3</div>
+        </div>
+        <div class="an-card accent-violet">
+            <div class="an-label">Daily Income Paid</div>
+            <div class="an-value">ETB ${totalDailyIncome.toFixed(2)}</div>
+            <div class="an-sub">All plans</div>
+        </div>
+        <div class="an-card">
+            <div class="an-label">Total Users</div>
+            <div class="an-value">${totalUsers}</div>
+            <div class="an-sub">${bannedCount} banned</div>
+        </div>
+    </div>
+
+    <div class="an-chart">
+        <h4><i class="fa-solid fa-circle-arrow-down" style="color:var(--primary);"></i> Deposits — last ${days} days</h4>
+        ${barHtml(depByDay, maxDep)}
+    </div>
+    <div class="an-chart">
+        <h4><i class="fa-solid fa-circle-arrow-up" style="color:var(--danger);"></i> Withdrawals — last ${days} days</h4>
+        ${barHtml(wdByDay, maxWd)}
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+        <button class="admin-btn outline" onclick="adminExportUsersCSV()"><i class="fa-solid fa-file-csv"></i> Export Users CSV</button>
+        <button class="admin-btn outline" onclick="adminExportTxnsCSV()"><i class="fa-solid fa-file-csv"></i> Export Transactions CSV</button>
+    </div>
+    `;
+}
+
+// ---------- USERS TAB (search + edit + ban + delete + detail) ----------
+let adminUserFilter = '';
+
+function renderAdminUsers() {
+    const container = document.getElementById('adminContent');
+    if (!container) return;
+
+    const q = (adminUserFilter || '').toLowerCase().trim();
+    const list = allUsersCache
+        .filter(u => !q ||
+            (u.name || '').toLowerCase().includes(q) ||
+            (u.phone || '').includes(q) ||
+            (u.refCode || '').toLowerCase().includes(q) ||
+            (u.referrer || '').toLowerCase().includes(q))
+        .sort((a, b) => (b.balance || 0) - (a.balance || 0));
+
+    let html = `
+    <h3 style="font-size:1rem; font-weight:800; margin-bottom:12px; text-transform:uppercase;">Manage Users (${allUsersCache.length})</h3>
+    <div class="admin-search-bar">
+        <input type="text" id="userSearch" placeholder="🔍 Search by name, phone, or ref code..." value="${escapeHtml(adminUserFilter)}" oninput="adminUserFilter=this.value; renderAdminUsers();">
+        <button class="admin-btn outline" onclick="adminUserFilter=''; document.getElementById('userSearch').value=''; renderAdminUsers();">Clear</button>
+    </div>
+    `;
+
+    if (list.length === 0) {
+        html += `<div style="text-align:center; padding:30px; color:var(--text-muted);">No users match "${escapeHtml(q)}".</div>`;
+    } else {
+        list.forEach(u => {
+            const isBanned = u.status === 'banned';
+            const statusPill = isBanned
+                ? '<span class="user-status-pill banned">Banned</span>'
+                : '<span class="user-status-pill active">Active</span>';
+            const invCount = u.investments ? Object.keys(u.investments).length : 0;
+            const txnCount = u.transactions ? Object.keys(u.transactions).length : 0;
+            html += `
+            <div class="admin-req-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;">
+                    <div style="min-width:0; flex:1;">
+                        <b style="font-size:0.95rem;">${escapeHtml(u.name || '—')}</b>${statusPill}
+                        <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">
+                            +251 ${escapeHtml(u.phone)} · Ref: <b>${escapeHtml(u.refCode || '—')}</b>
+                        </div>
+                        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">
+                            Joined: ${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}
+                            · ${invCount} plan(s) · ${txnCount} txn(s)
+                        </div>
+                    </div>
+                    <div style="text-align:right; flex-shrink:0;">
+                        <div style="font-weight:800; font-size:1.1rem; color:var(--primary-dark)">ETB ${(u.balance || 0).toFixed(2)}</div>
+                        <div style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Team: ETB ${(u.teamEarnings || 0).toFixed(0)}</div>
+                    </div>
+                </div>
+                <div class="plan-form-grid" style="margin-top:10px;">
+                    <div class="input-group" style="grid-column: 1/-1; display:flex; gap:6px;">
+                        <input type="number" id="balModAmt_${u.phone}" placeholder="Amount (ETB)" style="padding:10px;">
+                        <button class="admin-btn approve" style="padding:10px;" onclick="adminModifyUserBalance('${u.phone}', 'add')">+ Add</button>
+                        <button class="admin-btn reject" style="padding:10px;" onclick="adminModifyUserBalance('${u.phone}', 'sub')">- Deduct</button>
+                    </div>
+                </div>
+                <div class="user-row-actions">
+                    <button class="admin-btn outline" onclick="adminViewUserDetail('${u.phone}')"><i class="fa-solid fa-eye"></i> View</button>
+                    <button class="admin-btn outline" onclick="adminEditUserPrompt('${u.phone}')"><i class="fa-solid fa-pen"></i> Edit</button>
+                    <button class="admin-btn outline" onclick="adminResetPasswordPrompt('${u.phone}')"><i class="fa-solid fa-key"></i> Reset PW</button>
+                    ${isBanned
+                        ? `<button class="admin-btn approve" onclick="adminUnbanUser('${u.phone}')"><i class="fa-solid fa-unlock"></i> Unban</button>`
+                        : `<button class="admin-btn reject" onclick="adminBanUser('${u.phone}')"><i class="fa-solid fa-ban"></i> Ban</button>`}
+                    <button class="admin-btn reject" onclick="adminDeleteUser('${u.phone}')"><i class="fa-solid fa-trash"></i> Delete</button>
+                </div>
+            </div>
+            `;
+        });
+    }
+    container.innerHTML = html;
+}
+
+// ---------- TOP USERS / LEADERBOARD ----------
+function renderAdminTopUsers() {
+    const container = document.getElementById('adminContent');
+    if (!container) return;
+
+    const byBalance = [...allUsersCache].sort((a, b) => (b.balance || 0) - (a.balance || 0)).slice(0, 10);
+    const byTeam    = [...allUsersCache].sort((a, b) => (b.teamEarnings || 0) - (a.teamEarnings || 0)).slice(0, 10);
+    const byInvested = [...allUsersCache].map(u => {
+        const total = u.investments ? Object.values(u.investments).reduce((s, i) => s + (i.price || 0), 0) : 0;
+        return { ...u, totalInvested: total };
+    }).sort((a, b) => b.totalInvested - a.totalInvested).slice(0, 10);
+
+    const renderList = (list, valueKey, formatter) => {
+        if (list.length === 0) return `<div style="text-align:center; padding:20px; color:var(--text-muted);">No data yet.</div>`;
+        return list.map((u, i) => {
+            const rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+            return `
+            <div class="leader-row">
+                <div class="leader-rank ${rankCls}">${i + 1}</div>
+                <div class="leader-info">
+                    <div class="leader-name">${escapeHtml(u.name || '—')}</div>
+                    <div class="leader-phone">+251 ${escapeHtml(u.phone)}</div>
+                </div>
+                <div class="leader-amt">${formatter(u)}</div>
+            </div>`;
+        }).join('');
+    };
+
+    container.innerHTML = `
+    <h3 style="font-size:1rem; font-weight:800; margin-bottom:12px; text-transform:uppercase;">Top Users Leaderboard</h3>
+    <div class="settings-card">
+        <h4><i class="fa-solid fa-sack-dollar" style="color:var(--primary);"></i> Top 10 — Highest Balance</h4>
+        ${renderList(byBalance, 'balance', u => `ETB ${(u.balance || 0).toFixed(2)}`)}
+    </div>
+    <div class="settings-card">
+        <h4><i class="fa-solid fa-people-group" style="color:var(--primary);"></i> Top 10 — Team Earnings (Referrals)</h4>
+        ${renderList(byTeam, 'teamEarnings', u => `ETB ${(u.teamEarnings || 0).toFixed(2)}`)}
+    </div>
+    <div class="settings-card">
+        <h4><i class="fa-solid fa-rocket" style="color:var(--primary);"></i> Top 10 — Total Invested</h4>
+        ${renderList(byInvested, 'totalInvested', u => `ETB ${(u.totalInvested || 0).toFixed(2)}`)}
+    </div>
+    `;
+}
+
+// ---------- BROADCASTS / ANNOUNCEMENTS ----------
+function renderAdminBroadcasts() {
+    const container = document.getElementById('adminContent');
+    if (!container) return;
+
+    db.ref('broadcasts').orderByChild('at').limitToLast(20).once('value', (snap) => {
+        const list = [];
+        if (snap.exists()) snap.forEach(c => list.push({ id: c.key, ...c.val() }));
+        list.reverse(); // newest first
+
+        let html = `
+        <h3 style="font-size:1rem; font-weight:800; margin-bottom:12px; text-transform:uppercase;">Announcements / Broadcasts</h3>
+        <div class="settings-card">
+            <h4><i class="fa-solid fa-bullhorn" style="color:var(--primary);"></i> New Announcement</h4>
+            <p class="sub" style="color:var(--text-muted); font-size:0.78rem; font-weight:600; margin-bottom:10px;">
+                Posted broadcasts show up in every user's notification feed.
+            </p>
+            <div class="input-group">
+                <label>Title</label>
+                <input type="text" id="bcTitle" placeholder="e.g. System Maintenance Notice">
+            </div>
+            <div class="input-group">
+                <label>Message</label>
+                <textarea id="bcBody" rows="4" placeholder="Write your message here..." style="width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; font-size:0.85rem; resize:vertical;"></textarea>
+            </div>
+            <div class="input-group" style="margin-top:10px;">
+                <label>Type</label>
+                <select id="bcType" style="padding:10px; border-radius:10px; border:1px solid var(--border); font-weight:600;">
+                    <option value="info">Info</option>
+                    <option value="success">Success</option>
+                    <option value="warning">Warning</option>
+                    <option value="promo">Promo</option>
+                </select>
+            </div>
+            <button class="save-btn primary" style="margin-top:12px;" onclick="adminSendBroadcast()">
+                <i class="fa-solid fa-paper-plane"></i> Publish to All Users
+            </button>
+        </div>
+        <h3 style="font-size:1rem; font-weight:800; margin:16px 0 10px; text-transform:uppercase;">Recent Announcements (${list.length})</h3>
+        `;
+
+        if (list.length === 0) {
+            html += `<div style="text-align:center; padding:30px; color:var(--text-muted);">No announcements yet. Use the form above to publish your first one.</div>`;
+        } else {
+            list.forEach(b => {
+                html += `
+                <div class="broadcast-card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                        <div style="font-weight:800; font-size:0.9rem;">${escapeHtml(b.title || '(no title)')}</div>
+                        <button class="admin-btn reject" style="padding:6px 10px; font-size:0.7rem;" onclick="adminDeleteBroadcast('${b.id}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="b-meta">${b.at ? new Date(b.at).toLocaleString() : '—'} · type: <b>${escapeHtml(b.type || 'info')}</b></div>
+                    <div class="b-text">${escapeHtml(b.body || '')}</div>
+                </div>
+                `;
+            });
+        }
+        container.innerHTML = html;
+    });
+}
+
+function adminSendBroadcast() {
+    const title = (document.getElementById('bcTitle').value || '').trim();
+    const body  = (document.getElementById('bcBody').value || '').trim();
+    const type  = document.getElementById('bcType').value || 'info';
+    if (!title || !body) { showToast('Please fill in both title and message.'); return; }
+    db.ref('broadcasts').push({
+        title: title, body: body, type: type, at: new Date().toISOString()
+    }).then(() => {
+        adminLog('broadcast', title);
+        showToast('Announcement published to all users.');
+        document.getElementById('bcTitle').value = '';
+        document.getElementById('bcBody').value = '';
+        renderAdminBroadcasts();
+    }).catch(err => showToast('Failed: ' + err.message));
+}
+
+function adminDeleteBroadcast(id) {
+    if (!confirm('Delete this announcement?')) return;
+    db.ref('broadcasts/' + id).remove().then(() => {
+        adminLog('broadcast_delete', id);
+        showToast('Announcement deleted.');
+        renderAdminBroadcasts();
+    });
+}
+
+// ---------- ADMIN ACTIVITY LOG ----------
+function renderAdminActivityLog() {
+    const container = document.getElementById('adminContent');
+    if (!container) return;
+
+    db.ref('adminLog').orderByChild('at').limitToLast(100).once('value', (snap) => {
+        const list = [];
+        if (snap.exists()) snap.forEach(c => list.push({ id: c.key, ...c.val() }));
+        list.reverse();
+
+        let html = `
+        <h3 style="font-size:1rem; font-weight:800; margin-bottom:12px; text-transform:uppercase;">Admin Activity Log</h3>
+        <div class="settings-card">
+            <p class="sub" style="color:var(--text-muted); font-size:0.78rem; font-weight:600;">
+                Tracks every privileged action — approvals, balance edits, plan changes, broadcasts, etc.
+            </p>
+            <div style="margin-top:10px;">
+        `;
+        if (list.length === 0) {
+            html += `<div style="text-align:center; padding:20px; color:var(--text-muted);">No actions logged yet.</div>`;
+        } else {
+            list.forEach(e => {
+                html += `
+                <div class="admin-log-row">
+                    <div class="admin-log-time">${e.at ? new Date(e.at).toLocaleString() : '—'}</div>
+                    <div class="admin-log-text"><span class="tag">${escapeHtml(e.action || 'action')}</span> <b>${escapeHtml(e.detail || '')}</b></div>
+                </div>
+                `;
+            });
+        }
+        html += `</div></div>`;
+        container.innerHTML = html;
+    });
+}
+
+// ---------- USER DETAIL MODAL ----------
+function adminViewUserDetail(phone) {
+    const u = allUsersCache.find(x => x.phone === phone);
+    if (!u) { showToast('User not found.'); return; }
+    const txns = u.transactions ? Object.values(u.transactions).sort((a,b) => new Date(b.date) - new Date(a.date)) : [];
+    const invs  = u.investments ? Object.values(u.investments) : [];
+    const recent = txns.slice(0, 8);
+
+    const txnRows = recent.length === 0
+        ? '<div style="text-align:center; padding:10px; color:var(--text-muted); font-size:0.8rem;">No transactions yet.</div>'
+        : recent.map(t => `
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-soft); font-size:0.78rem;">
+                <div>
+                    <div style="font-weight:700; color:var(--text-main);">${escapeHtml(t.title || '—')}</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">${t.date ? new Date(t.date).toLocaleString() : '—'} · ${escapeHtml(t.status || '')}</div>
+                </div>
+                <div style="font-weight:800; color:${t.type === 'income' ? 'var(--primary)' : 'var(--danger)'};">
+                    ${t.type === 'income' ? '+' : '-'}ETB ${(t.amount || 0).toFixed(2)}
+                </div>
+            </div>
+        `).join('');
+
+    const invRows = invs.length === 0
+        ? '<div style="text-align:center; padding:10px; color:var(--text-muted); font-size:0.8rem;">No investments yet.</div>'
+        : invs.map(i => `
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-soft); font-size:0.78rem;">
+                <div>
+                    <div style="font-weight:700;">${escapeHtml(i.name || '—')}</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">${i.daysClaimed || 0} / ${i.days || 0} days · ${escapeHtml(i.status || '')}</div>
+                </div>
+                <div style="font-weight:800;">ETB ${(i.price || 0).toFixed(2)}</div>
+            </div>
+        `).join('');
+
+    const modal = document.createElement('div');
+    modal.className = 'admin-modal-backdrop';
+    modal.id = 'adminUserModal';
+    modal.innerHTML = `
+    <div class="admin-modal" onclick="event.stopPropagation()">
+        <h3>
+            <span><i class="fa-solid fa-user"></i> ${escapeHtml(u.name || '—')}</span>
+            <div class="close-x" onclick="document.getElementById('adminUserModal').remove()"><i class="fa-solid fa-xmark"></i></div>
+        </h3>
+        <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:8px;">
+            +251 ${escapeHtml(u.phone)} · Ref: <b>${escapeHtml(u.refCode || '—')}</b><br>
+            Joined: ${u.createdAt ? new Date(u.createdAt).toLocaleString() : '—'}<br>
+            Referred by: <b>${escapeHtml(u.referrer || '—')}</b> · Status: <b>${escapeHtml(u.status || 'active')}</b>
+        </div>
+        <div class="user-stat-row">
+            <div class="us"><div class="l">Balance</div><div class="v">ETB ${(u.balance || 0).toFixed(2)}</div></div>
+            <div class="us"><div class="l">Team Earn</div><div class="v">ETB ${(u.teamEarnings || 0).toFixed(2)}</div></div>
+            <div class="us"><div class="l">Plans</div><div class="v">${invs.length}</div></div>
+        </div>
+        <div style="font-weight:800; font-size:0.78rem; text-transform:uppercase; margin:8px 0 4px; color:var(--text-muted);">Recent Transactions</div>
+        <div style="max-height:180px; overflow-y:auto;">${txnRows}</div>
+        <div style="font-weight:800; font-size:0.78rem; text-transform:uppercase; margin:12px 0 4px; color:var(--text-muted);">Investments</div>
+        <div>${invRows}</div>
+    </div>
+    `;
+    modal.onclick = () => modal.remove();
+    document.body.appendChild(modal);
+}
+
+// ---------- EDIT / BAN / DELETE / RESET PW ----------
+function adminEditUserPrompt(phone) {
+    const u = allUsersCache.find(x => x.phone === phone);
+    if (!u) return;
+    const newName = prompt('Edit name for ' + phone + ':', u.name || '');
+    if (newName === null) return;
+    const trimmed = newName.trim();
+    if (!trimmed) { showToast('Name cannot be empty.'); return; }
+    db.ref(`users/${phone}/name`).set(trimmed).then(() => {
+        adminLog('edit_user_name', phone + ' → ' + trimmed);
+        showToast('User updated.');
+    });
+}
+
+function adminResetPasswordPrompt(phone) {
+    const np = prompt('Set a new password for ' + phone + ' (min 4 chars):', '');
+    if (np === null) return;
+    if ((np || '').length < 4) { showToast('Password must be at least 4 characters.'); return; }
+    db.ref(`users/${phone}/password`).set(np).then(() => {
+        adminLog('reset_password', phone);
+        showToast('Password updated.');
+    });
+}
+
+function adminBanUser(phone) {
+    if (!confirm('Ban this user? They will not be able to log in.')) return;
+    db.ref(`users/${phone}/status`).set('banned').then(() => {
+        adminLog('ban_user', phone);
+        showToast('User banned.');
+        renderAdminContent();
+    });
+}
+
+function adminUnbanUser(phone) {
+    db.ref(`users/${phone}/status`).remove().then(() => {
+        adminLog('unban_user', phone);
+        showToast('User unbanned.');
+        renderAdminContent();
+    });
+}
+
+function adminDeleteUser(phone) {
+    if (!confirm('PERMANENTLY delete this user and ALL their data? This cannot be undone.')) return;
+    if (!confirm('Are you absolutely sure? Type OK in your head and click OK.')) return;
+    db.ref(`users/${phone}`).remove().then(() => {
+        // Also remove their refCode mapping if it points to them
+        db.ref('refCodes').orderByValue().equalTo(phone).once('value', (snap) => {
+            const updates = {};
+            if (snap.exists()) snap.forEach(c => updates['refCodes/' + c.key] = null);
+            if (Object.keys(updates).length) db.ref().update(updates);
+        });
+        adminLog('delete_user', phone);
+        showToast('User deleted.');
+    });
+}
+
+// ---------- EDIT PLAN ----------
+function adminEditPlanPrompt(planId) {
+    const plan = PLANS.find(p => p.id === planId);
+    if (!plan) { showToast('Plan not found.'); return; }
+    const newName = prompt('Plan name:', plan.name || '');
+    if (newName === null) return;
+    const newPriceStr = prompt('Price (ETB):', String(plan.price || 0));
+    if (newPriceStr === null) return;
+    const newDailyStr = prompt('Daily income (ETB):', String(plan.daily || 0));
+    if (newDailyStr === null) return;
+    const newDaysStr = prompt('Duration (days):', String(plan.days || 0));
+    if (newDaysStr === null) return;
+    const newDesc = prompt('Description:', plan.desc || '');
+    if (newDesc === null) return;
+
+    const newPrice = parseFloat(newPriceStr) || 0;
+    const newDaily = parseFloat(newDailyStr) || 0;
+    const newDays  = parseInt(newDaysStr) || 0;
+    const trimmedName = (newName || '').trim();
+
+    if (!trimmedName || newPrice <= 0 || newDaily <= 0 || newDays <= 0) {
+        showToast('Please enter valid values for all fields.'); return;
+    }
+
+    const updated = {
+        ...plan,
+        name: trimmedName,
+        price: newPrice,
+        daily: newDaily,
+        days: newDays,
+        desc: newDesc.trim()
+    };
+    db.ref('plans/' + planId).set(updated).then(() => {
+        adminLog('edit_plan', planId + ' → ' + trimmedName);
+        showToast('Plan updated.');
+    });
+}
+
+// ---------- MAINTENANCE MODE TOGGLE (added into settings) ----------
+function adminToggleMaintenance(checked) {
+    db.ref('settings/maintenanceMode').set(!!checked).then(() => {
+        APP_SETTINGS.maintenanceMode = !!checked;
+        adminLog('maintenance', checked ? 'ON' : 'OFF');
+        showToast('Maintenance mode ' + (checked ? 'enabled' : 'disabled') + '.');
+    });
+}
+
+// ---------- CSV EXPORT ----------
+function adminExportUsersCSV() {
+    if (allUsersCache.length === 0) { showToast('No users to export.'); return; }
+    const header = ['Phone', 'Name', 'Balance', 'TeamEarnings', 'RefCode', 'Referrer', 'Status', 'CreatedAt', 'PlanCount', 'TxnCount'];
+    const rows = allUsersCache.map(u => [
+        u.phone || '',
+        '"' + String(u.name || '').replace(/"/g, '""') + '"',
+        (u.balance || 0).toFixed(2),
+        (u.teamEarnings || 0).toFixed(2),
+        u.refCode || '',
+        u.referrer || '',
+        u.status || 'active',
+        u.createdAt || '',
+        u.investments ? Object.keys(u.investments).length : 0,
+        u.transactions ? Object.keys(u.transactions).length : 0
+    ].join(','));
+    const csv = header.join(',') + '\n' + rows.join('\n');
+    adminDownloadCSV(csv, 'apexinvest_users_' + Date.now() + '.csv');
+    adminLog('export_users', allUsersCache.length + ' rows');
+}
+
+function adminExportTxnsCSV() {
+    const rows = [];
+    allUsersCache.forEach(u => {
+        if (!u.transactions) return;
+        Object.values(u.transactions).forEach(t => {
+            rows.push([
+                u.phone || '',
+                '"' + String(u.name || '').replace(/"/g, '""') + '"',
+                t.type || '',
+                '"' + String(t.title || '').replace(/"/g, '""') + '"',
+                (t.amount || 0).toFixed(2),
+                t.status || '',
+                t.date || ''
+            ].join(','));
+        });
+    });
+    if (rows.length === 0) { showToast('No transactions to export.'); return; }
+    const header = ['Phone', 'Name', 'Type', 'Title', 'Amount', 'Status', 'Date'];
+    const csv = header.join(',') + '\n' + rows.join('\n');
+    adminDownloadCSV(csv, 'apexinvest_transactions_' + Date.now() + '.csv');
+    adminLog('export_txns', rows.length + ' rows');
+}
+
+function adminDownloadCSV(csv, filename) {
+    try {
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+        // Fallback: open in new tab
+        const w = window.open('', '_blank');
+        if (w) { w.document.write('<pre>' + escapeHtml(csv) + '</pre>'); }
+    }
+}
+
+// ---------- Override existing key admin functions to log activity ----------
+// Wrap so we don't need to edit each call site.
+const _origApproveDeposit = adminApproveDeposit;
+adminApproveDeposit = function(userPhone, txnId, amt) {
+    const r = _origApproveDeposit(userPhone, txnId, amt);
+    adminLog('approve_deposit', userPhone + ' ETB ' + amt);
+    return r;
+};
+const _origRejectDeposit = adminRejectDeposit;
+adminRejectDeposit = function(userPhone, txnId) {
+    const r = _origRejectDeposit(userPhone, txnId);
+    adminLog('reject_deposit', userPhone + ' txn ' + txnId);
+    return r;
+};
+const _origApproveWd = adminApproveWithdrawal;
+adminApproveWithdrawal = function(userPhone, txnId) {
+    const r = _origApproveWd(userPhone, txnId);
+    adminLog('approve_withdrawal', userPhone + ' txn ' + txnId);
+    return r;
+};
+const _origRejectWd = adminRejectWithdrawal;
+adminRejectWithdrawal = function(userPhone, txnId, refundAmt) {
+    const r = _origRejectWd(userPhone, txnId, refundAmt);
+    adminLog('reject_withdrawal', userPhone + ' refund ' + refundAmt);
+    return r;
+};
+const _origRelease = adminReleaseDailyIncome;
+adminReleaseDailyIncome = function(planId) {
+    const r = _origRelease(planId);
+    adminLog('release_daily', planId);
+    return r;
+};
+const _origModBal = adminModifyUserBalance;
+adminModifyUserBalance = function(phone, action) {
+    const amt = parseFloat((document.getElementById('balModAmt_' + phone) || {}).value) || 0;
+    const r = _origModBal(phone, action);
+    adminLog('balance_mod', phone + ' ' + action + ' ' + amt);
+    return r;
+};
+const _origCreatePlan = adminCreatePlan;
+adminCreatePlan = function() {
+    const r = _origCreatePlan();
+    adminLog('create_plan', document.getElementById('newPlanName')?.value || '');
+    return r;
+};
+const _origDeletePlan = adminDeletePlan;
+adminDeletePlan = function(planId) {
+    const r = _origDeletePlan(planId);
+    adminLog('delete_plan', planId);
+    return r;
+};
+const _origSaveConfig = adminSaveConfig;
+adminSaveConfig = function() {
+    const r = _origSaveConfig();
+    adminLog('save_config', 'app settings updated');
+    return r;
+};
+const _origCreateGift = adminCreateGiftCode;
+adminCreateGiftCode = function() {
+    const code = document.getElementById('gCode')?.value || '';
+    const r = _origCreateGift();
+    adminLog('create_giftcode', code);
+    return r;
+};
 </script>
 </body>
 </html>
