@@ -5386,46 +5386,80 @@ function renderAdminContent() {
     } 
     
     else if (activeAdminTab === 'daily') {
+        // === SINGLE GLOBAL RELEASE BUTTON ===
+        // Count active investments per plan + total daily payout, across ALL users.
+        let totalActive = 0;
+        let totalDailyPayout = 0;
+        let planSummary = [];
+
+        PLANS.forEach(plan => {
+            let countActive = 0;
+            allUsersCache.forEach(u => {
+                if (u.investments) {
+                    Object.values(u.investments).forEach(i => {
+                        if (i.planId === plan.id && i.status === 'active') {
+                            countActive++;
+                        }
+                    });
+                }
+            });
+            const planDailyPayout = countActive * (Number(plan.daily) || 0);
+            totalActive += countActive;
+            totalDailyPayout += planDailyPayout;
+            planSummary.push({ name: plan.name, count: countActive, daily: plan.daily, total: planDailyPayout });
+        });
+
         let html = `
         <h3 style="font-size:1rem; font-weight:800; margin-bottom:4px; text-transform:uppercase;">Daily Income Release</h3>
-        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;">Trigger calculations for active user investments[cite: 1].</p>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;">One button releases today's earnings for all active investments across every plan.</p>
         `;
 
         if (PLANS.length === 0) {
-            html += `<div style="text-align:center; padding:30px; color:var(--text-muted);">No plans available. Create a plan under the Plans tab first[cite: 1].</div>`;
-        } else {
-            PLANS.forEach(plan => {
-                let countActive = 0;
-                allUsersCache.forEach(u => {
-                    if (u.investments) {
-                        Object.values(u.investments).forEach(i => {
-                            if (i.planId === plan.id && i.status === 'active') {
-                                countActive++;
-                            }
-                        });
-                    }
-                });
+            html += `<div style="text-align:center; padding:30px; color:var(--text-muted);">No plans available. Create a plan under the Plans tab first.</div>`;
+            container.innerHTML = html;
+            return;
+        }
 
+        // Master summary card + single global release button
+        html += `
+        <div class="di-plan-card" style="border-left:4px solid var(--primary);">
+            <div class="di-plan-head">
+                <div class="di-plan-info">
+                    <div class="di-plan-name" style="font-size:1.05rem;">All Plans · Global Release</div>
+                    <div class="di-plan-meta">${totalActive} active investment(s) · ETB ${totalDailyPayout.toFixed(2)} total payout today</div>
+                </div>
+                <span class="di-status-badge ${totalActive > 0 ? 'pending' : 'empty'}">
+                    ${totalActive} Active
+                </span>
+            </div>
+            <button class="di-release-btn go" id="globalReleaseBtn" onclick="adminReleaseDailyIncome()" ${totalActive === 0 ? 'disabled' : ''}>
+                <i class="fa-solid fa-bolt"></i> Release All Daily Earnings
+            </button>
+        </div>
+        `;
+
+        // Per-plan breakdown (read-only, for visibility) — each plan's individual payout
+        if (planSummary.length > 0) {
+            html += `<h4 style="font-size:0.78rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px; margin:18px 0 10px;">Breakdown by Plan</h4>`;
+            planSummary.forEach(p => {
                 html += `
-                <div class="di-plan-card">
+                <div class="di-plan-card" style="opacity:${p.count > 0 ? '1' : '0.55'};">
                     <div class="di-plan-head">
                         <div class="di-plan-info">
-                            <div class="di-plan-name">${plan.name}</div>
-                            <div class="di-plan-meta">Price: ETB ${plan.price} · Payout: ETB ${plan.daily}/Day</div>
+                            <div class="di-plan-name">${p.name}</div>
+                            <div class="di-plan-meta">ETB ${p.daily}/day per investment · ${p.count} active · ETB ${p.total.toFixed(2)} today</div>
                         </div>
-                        <span class="di-status-badge ${countActive > 0 ? 'pending' : 'empty'}">
-                            ${countActive} Active
+                        <span class="di-status-badge ${p.count > 0 ? 'pending' : 'empty'}">
+                            ${p.count} Active
                         </span>
                     </div>
-                    <button class="di-release-btn go" onclick="adminReleaseDailyIncome('${plan.id}')" ${countActive === 0 ? 'disabled' : ''}>
-                        <i class="fa-solid fa-bolt"></i> Release Daily Earnings (ETB ${plan.daily})
-                    </button>
                 </div>
                 `;
             });
         }
+
         container.innerHTML = html;
-    } 
+    }
 
     else if (activeAdminTab === 'users') {
         renderAdminUsers();
@@ -5694,46 +5728,78 @@ function adminRejectWithdrawal(userPhone, txnId, refundAmt) {
 }
 
 function adminReleaseDailyIncome(planId) {
-    const plan = PLANS.find(p => p.id === planId);
-    if (!plan) return;
+    // === GLOBAL RELEASE: no planId needed; iterates ALL plans & ALL active investments ===
+    // If a planId is passed, behavior is the same (kept for backward compatibility with wrappers).
+    const plansToProcess = planId ? PLANS.filter(p => p.id === planId) : PLANS;
+    if (plansToProcess.length === 0) return;
+
+    // Prevent double-click while running
+    const btn = document.getElementById('globalReleaseBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Releasing...'; }
 
     db.ref('users').once('value', (snapshot) => {
-        if (!snapshot.exists()) return;
+        if (!snapshot.exists()) {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Release All Daily Earnings'; }
+            return;
+        }
         let processedCount = 0;
+        let totalPaid = 0;
+        const planCounters = {}; // planId -> count released
+
+        // Build a quick lookup of plans by id
+        const planById = {};
+        plansToProcess.forEach(p => { planById[p.id] = p; });
+
         snapshot.forEach(userSnap => {
             const phone = userSnap.key;
             const userData = userSnap.val();
             if (userData.investments) {
                 Object.values(userData.investments).forEach(inv => {
-                    if (inv.planId === planId && inv.status === 'active') {
-                        const nextDaysClaimed = (inv.daysClaimed || 0) + 1;
-                        const isFinished = nextDaysClaimed >= inv.days;
-                        const currentBalance = userData.balance || 0;
-                        const newBalance = currentBalance + inv.daily;
+                    if (inv.status !== 'active') return;
+                    const plan = planById[inv.planId];
+                    if (!plan) return; // skip investments whose plan no longer exists
 
-                        db.ref(`users/${phone}/investments/${inv.id}`).update({
-                            daysClaimed: nextDaysClaimed,
-                            status: isFinished ? 'completed' : 'active'
-                        });
+                    const nextDaysClaimed = (inv.daysClaimed || 0) + 1;
+                    const isFinished = nextDaysClaimed >= inv.days;
+                    const currentBalance = userData.balance || 0;
+                    const payout = Number(inv.daily) || 0;
+                    const newBalance = currentBalance + payout;
 
-                        db.ref(`users/${phone}/balance`).set(newBalance);
+                    db.ref(`users/${phone}/investments/${inv.id}`).update({
+                        daysClaimed: nextDaysClaimed,
+                        status: isFinished ? 'completed' : 'active'
+                    });
 
-                        const newTxnRef = db.ref(`users/${phone}/transactions`).push();
-                        newTxnRef.set({
-                            id: newTxnRef.key,
-                            type: 'income',
-                            title: `${plan.name} Daily Release`,
-                            amount: inv.daily,
-                            date: new Date().toISOString(),
-                            status: 'completed'
-                        });
+                    db.ref(`users/${phone}/balance`).set(newBalance);
 
-                        processedCount++;
-                    }
+                    const newTxnRef = db.ref(`users/${phone}/transactions`).push();
+                    newTxnRef.set({
+                        id: newTxnRef.key,
+                        type: 'income',
+                        title: `${plan.name} Daily Release`,
+                        amount: payout,
+                        date: new Date().toISOString(),
+                        status: 'completed'
+                    });
+
+                    processedCount++;
+                    totalPaid += payout;
+                    planCounters[plan.id] = (planCounters[plan.id] || 0) + 1;
                 });
             }
         });
-        showToast(`Successfully released ETB ${plan.daily} to ${processedCount} users!`);
+
+        if (processedCount === 0) {
+            showToast("No active investments to release today.");
+        } else {
+            const planNames = Object.keys(planCounters)
+                .map(pid => {
+                    const p = planById[pid];
+                    return p ? `${p.name} (${planCounters[pid]})` : `${planCounters[pid]}`;
+                })
+                .join(', ');
+            showToast(`Released ETB ${totalPaid.toFixed(2)} to ${processedCount} investments across ${Object.keys(planCounters).length} plan(s): ${planNames}`);
+        }
         renderAdminContent();
     });
 }
@@ -6815,7 +6881,7 @@ adminRejectWithdrawal = function(userPhone, txnId, refundAmt) {
 const _origRelease = adminReleaseDailyIncome;
 adminReleaseDailyIncome = function(planId) {
     const r = _origRelease(planId);
-    adminLog('release_daily', planId);
+    adminLog('release_daily', planId || 'ALL_PLANS');
     return r;
 };
 const _origModBal = adminModifyUserBalance;
