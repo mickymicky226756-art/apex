@@ -3291,10 +3291,34 @@ function signup() {
                     }
 
                     showToast("Account created successfully!");
-                    // Show the welcome promo (plans + Telegram) before the user logs in
+
+                    // Auto-login: persist the session, swap views, sync data.
+                    localStorage.setItem('userPhone', phone);
+                    localStorage.setItem('isAdmin', 'false');
+                    state.isAdmin = false;
+                    document.getElementById('authModal').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+
+                    // Reset the auth form so it doesn't carry the credentials
+                    // the user just typed in case they log out later.
+                    const regName = document.getElementById('regName');
+                    const regPhone = document.getElementById('regPhone');
+                    const regPass = document.getElementById('regPass');
+                    const regRef = document.getElementById('regRef');
+                    if (regName)  regName.value = '';
+                    if (regPhone) regPhone.value = '';
+                    if (regPass)  regPass.value = '';
+                    if (regRef)   regRef.value = '';
+                    const loginPhone = document.getElementById('loginPhone');
+                    const loginPass = document.getElementById('loginPass');
+                    if (loginPhone) loginPhone.value = '';
+                    if (loginPass)  loginPass.value = '';
+                    if (typeof toggleAuth === 'function') toggleAuth('login');
+
+                    // Pull user data + pop the welcome promo on the home view.
+                    syncUserData(phone);
                     try { sessionStorage.removeItem('welcomePromoShown'); } catch (e) {}
-                    setTimeout(() => { if (typeof showWelcomePromo === 'function') showWelcomePromo(true); }, 300);
-                    toggleAuth('login');
+                    setTimeout(() => { if (typeof showWelcomePromo === 'function') showWelcomePromo(true); }, 700);
                 });
             });
         };
