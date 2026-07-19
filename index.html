@@ -5404,6 +5404,19 @@ function adminApproveDeposit(userPhone, txnId, amt) {
     });
 }
 
+// Resolve a `referrer` field value (which may be a referral code OR a
+// legacy phone number) into the actual user phone. Calls cb(phone|null).
+function resolveReferrerPhone(refValue, cb) {
+    if (!refValue) return cb(null);
+    db.ref('refCodes/' + refValue).once('value', (codeSnap) => {
+        if (codeSnap.exists() && codeSnap.val()) return cb(codeSnap.val());
+        // Legacy fallback: refValue might already be a phone
+        db.ref('users/' + refValue).once('value', (u) => {
+            cb(u.exists() ? refValue : null);
+        });
+    });
+}
+
 function creditReferralCommissions(userPhone, baseAmount, sourceLabel) {
     // sourceLabel is optional — e.g. plan name like "Bronze Plan". When provided
     // it shows up in the referrer's transaction title; otherwise we fall back
@@ -5412,75 +5425,60 @@ function creditReferralCommissions(userPhone, baseAmount, sourceLabel) {
         ? `Level ${lvl} Commission — ${sourceLabel}`
         : `Level ${lvl} Commission (${userData.name})`;
 
+    // Credit `comm` ETB to `parentPhone`'s balance, teamEarnings, and log
+    // an income transaction. No-op if the user record is missing.
+    const creditTo = (parentPhone, level, userData, comm) => {
+        if (!comm || comm <= 0) return;
+        db.ref('users/' + parentPhone).once('value', (pSnap) => {
+            if (!pSnap.exists()) return;
+            const pData = pSnap.val();
+            db.ref(`users/${parentPhone}/balance`).set((pData.balance || 0) + comm);
+            db.ref(`users/${parentPhone}/teamEarnings`).set((pData.teamEarnings || 0) + comm);
+
+            const txnRef = db.ref(`users/${parentPhone}/transactions`).push();
+            txnRef.set({
+                id: txnRef.key,
+                type: 'income',
+                title: labelFor(level, userData),
+                amount: comm,
+                date: new Date().toISOString(),
+                status: 'completed'
+            });
+        });
+    };
+
     db.ref(`users/${userPhone}`).once('value', (snap) => {
         if (!snap.exists()) return;
         const userData = snap.val();
 
-        // Level 1 commission
-        const l1Parent = userData.referrer;
-        if (l1Parent) {
-            db.ref(`users/${l1Parent}`).once('value', (p1Snap) => {
-                if (p1Snap.exists()) {
-                    const comm = (APP_SETTINGS.referralLevel1 / 100) * baseAmount;
-                    db.ref(`users/${l1Parent}/balance`).set((p1Snap.val().balance || 0) + comm);
-                    db.ref(`users/${l1Parent}/teamEarnings`).set((p1Snap.val().teamEarnings || 0) + comm);
+        // Level 1 commission — resolve the stored ref-code/phone to a real phone first
+        resolveReferrerPhone(userData.referrer, (l1Phone) => {
+            if (!l1Phone) return;
+            const comm1 = (APP_SETTINGS.referralLevel1 / 100) * baseAmount;
+            creditTo(l1Phone, 1, userData, comm1);
 
-                    const txnRef = db.ref(`users/${l1Parent}/transactions`).push();
-                    txnRef.set({
-                        id: txnRef.key,
-                        type: 'income',
-                        title: labelFor(1, userData),
-                        amount: comm,
-                        date: new Date().toISOString(),
-                        status: 'completed'
-                    });
+            // Level 2 — pull L1's full record so we can read their `referrer`
+            db.ref('users/' + l1Phone).once('value', (p1Snap) => {
+                if (!p1Snap.exists()) return;
+                const p1Data = p1Snap.val();
+                resolveReferrerPhone(p1Data.referrer, (l2Phone) => {
+                    if (!l2Phone) return;
+                    const comm2 = (APP_SETTINGS.referralLevel2 / 100) * baseAmount;
+                    creditTo(l2Phone, 2, userData, comm2);
 
-                    // Level 2 commission
-                    const l2Parent = p1Snap.val().referrer;
-                    if (l2Parent) {
-                        db.ref(`users/${l2Parent}`).once('value', (p2Snap) => {
-                            if (p2Snap.exists()) {
-                                const comm2 = (APP_SETTINGS.referralLevel2 / 100) * baseAmount;
-                                db.ref(`users/${l2Parent}/balance`).set((p2Snap.val().balance || 0) + comm2);
-                                db.ref(`users/${l2Parent}/teamEarnings`).set((p2Snap.val().teamEarnings || 0) + comm2);
-
-                                const txnRef2 = db.ref(`users/${l2Parent}/transactions`).push();
-                                txnRef2.set({
-                                    id: txnRef2.key,
-                                    type: 'income',
-                                    title: labelFor(2, userData),
-                                    amount: comm2,
-                                    date: new Date().toISOString(),
-                                    status: 'completed'
-                                });
-
-                                // Level 3 commission
-                                const l3Parent = p2Snap.val().referrer;
-                                if (l3Parent) {
-                                    db.ref(`users/${l3Parent}`).once('value', (p3Snap) => {
-                                        if (p3Snap.exists()) {
-                                            const comm3 = (APP_SETTINGS.referralLevel3 / 100) * baseAmount;
-                                            db.ref(`users/${l3Parent}/balance`).set((p3Snap.val().balance || 0) + comm3);
-                                            db.ref(`users/${l3Parent}/teamEarnings`).set((p3Snap.val().teamEarnings || 0) + comm3);
-
-                                            const txnRef3 = db.ref(`users/${l3Parent}/transactions`).push();
-                                            txnRef3.set({
-                                                id: txnRef3.key,
-                                                type: 'income',
-                                                title: labelFor(3, userData),
-                                                amount: comm3,
-                                                date: new Date().toISOString(),
-                                                status: 'completed'
-                                            });
-                                        }
-                                    });
-                                }
-                            }
+                    // Level 3
+                    db.ref('users/' + l2Phone).once('value', (p2Snap) => {
+                        if (!p2Snap.exists()) return;
+                        const p2Data = p2Snap.val();
+                        resolveReferrerPhone(p2Data.referrer, (l3Phone) => {
+                            if (!l3Phone) return;
+                            const comm3 = (APP_SETTINGS.referralLevel3 / 100) * baseAmount;
+                            creditTo(l3Phone, 3, userData, comm3);
                         });
-                    }
-                }
+                    });
+                });
             });
-        }
+        });
     });
 }
 
