@@ -3549,6 +3549,11 @@ function buyPlan(planId) {
     db.ref(`users/${state.user.phone}/balance`).set(currentBalance);
     db.ref(`users/${state.user.phone}/investments/${investId}`).set(newInvestment);
     db.ref(`users/${state.user.phone}/transactions/${txnId}`).set(newTxn).then(() => {
+        // Auto-credit referral commissions to L1/L2/L3 referrers the moment
+        // a referee invests. `commissionCredited` guards against re-firing
+        // if this record is re-processed (e.g. admin re-runs the trigger).
+        db.ref(`users/${state.user.phone}/investments/${investId}/commissionCredited`).set(true);
+        try { creditReferralCommissions(state.user.phone, plan.price, plan.name); } catch (e) { console.error('Referral commission error:', e); }
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         showSuccessModal("Investment Activated!", `Your plan "${plan.name}" is now running. You will receive ETB ${plan.daily} daily.`);
     });
@@ -5386,14 +5391,24 @@ function adminApproveDeposit(userPhone, txnId, amt) {
         const newBal = currentBal + amt;
 
         db.ref(`users/${userPhone}/balance`).set(newBal);
+        // NOTE: referral commissions are now credited on INVESTMENT (buyPlan),
+        // not on deposit approval — so we don't fire them here. That keeps the
+        // payout tied to real investment activity and avoids double-paying when
+        // a deposited balance is then used to buy a plan.
         db.ref(`users/${userPhone}/transactions/${txnId}/status`).set('completed').then(() => {
-            creditReferralCommissions(userPhone, amt);
             showToast("Deposit approved successfully!");
         });
     });
 }
 
-function creditReferralCommissions(userPhone, depositAmount) {
+function creditReferralCommissions(userPhone, baseAmount, sourceLabel) {
+    // sourceLabel is optional — e.g. plan name like "Bronze Plan". When provided
+    // it shows up in the referrer's transaction title; otherwise we fall back
+    // to the referee's name for backward compatibility.
+    const labelFor = (lvl, userData) => sourceLabel
+        ? `Level ${lvl} Commission — ${sourceLabel}`
+        : `Level ${lvl} Commission (${userData.name})`;
+
     db.ref(`users/${userPhone}`).once('value', (snap) => {
         if (!snap.exists()) return;
         const userData = snap.val();
@@ -5403,15 +5418,15 @@ function creditReferralCommissions(userPhone, depositAmount) {
         if (l1Parent) {
             db.ref(`users/${l1Parent}`).once('value', (p1Snap) => {
                 if (p1Snap.exists()) {
-                    const comm = (APP_SETTINGS.referralLevel1 / 100) * depositAmount;
+                    const comm = (APP_SETTINGS.referralLevel1 / 100) * baseAmount;
                     db.ref(`users/${l1Parent}/balance`).set((p1Snap.val().balance || 0) + comm);
                     db.ref(`users/${l1Parent}/teamEarnings`).set((p1Snap.val().teamEarnings || 0) + comm);
-                    
+
                     const txnRef = db.ref(`users/${l1Parent}/transactions`).push();
                     txnRef.set({
                         id: txnRef.key,
                         type: 'income',
-                        title: `Level 1 Commission (${userData.name})`,
+                        title: labelFor(1, userData),
                         amount: comm,
                         date: new Date().toISOString(),
                         status: 'completed'
@@ -5422,15 +5437,15 @@ function creditReferralCommissions(userPhone, depositAmount) {
                     if (l2Parent) {
                         db.ref(`users/${l2Parent}`).once('value', (p2Snap) => {
                             if (p2Snap.exists()) {
-                                const comm2 = (APP_SETTINGS.referralLevel2 / 100) * depositAmount;
+                                const comm2 = (APP_SETTINGS.referralLevel2 / 100) * baseAmount;
                                 db.ref(`users/${l2Parent}/balance`).set((p2Snap.val().balance || 0) + comm2);
                                 db.ref(`users/${l2Parent}/teamEarnings`).set((p2Snap.val().teamEarnings || 0) + comm2);
-                                
+
                                 const txnRef2 = db.ref(`users/${l2Parent}/transactions`).push();
                                 txnRef2.set({
                                     id: txnRef2.key,
                                     type: 'income',
-                                    title: `Level 2 Commission (${userData.name})`,
+                                    title: labelFor(2, userData),
                                     amount: comm2,
                                     date: new Date().toISOString(),
                                     status: 'completed'
@@ -5441,15 +5456,15 @@ function creditReferralCommissions(userPhone, depositAmount) {
                                 if (l3Parent) {
                                     db.ref(`users/${l3Parent}`).once('value', (p3Snap) => {
                                         if (p3Snap.exists()) {
-                                            const comm3 = (APP_SETTINGS.referralLevel3 / 100) * depositAmount;
+                                            const comm3 = (APP_SETTINGS.referralLevel3 / 100) * baseAmount;
                                             db.ref(`users/${l3Parent}/balance`).set((p3Snap.val().balance || 0) + comm3);
                                             db.ref(`users/${l3Parent}/teamEarnings`).set((p3Snap.val().teamEarnings || 0) + comm3);
-                                            
+
                                             const txnRef3 = db.ref(`users/${l3Parent}/transactions`).push();
                                             txnRef3.set({
                                                 id: txnRef3.key,
                                                 type: 'income',
-                                                title: `Level 3 Commission (${userData.name})`,
+                                                title: labelFor(3, userData),
                                                 amount: comm3,
                                                 date: new Date().toISOString(),
                                                 status: 'completed'
