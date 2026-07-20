@@ -3386,6 +3386,30 @@ function syncUserData(phone) {
         if (typeof data.teamEarnings !== 'number') {
             db.ref('users/' + phone + '/teamEarnings').set(0);
         }
+
+        // Backfill per-level commission fields. For accounts created before
+        // these fields existed, reconstruct from the user's existing income
+        // transactions (titles start with "Level N Commission") so the team
+        // detail page can show real per-level totals instead of zeros. If no
+        // commission transactions exist, just initialise to 0.
+        if (typeof data.teamEarningsL1 !== 'number' ||
+            typeof data.teamEarningsL2 !== 'number' ||
+            typeof data.teamEarningsL3 !== 'number') {
+            const txns = data.transactions ? Object.values(data.transactions) : [];
+            let l1 = 0, l2 = 0, l3 = 0;
+            txns.forEach(t => {
+                if (!t || t.type !== 'income' || typeof t.amount !== 'number') return;
+                const title = String(t.title || '');
+                if (title.startsWith('Level 1 Commission')) l1 += t.amount;
+                else if (title.startsWith('Level 2 Commission')) l2 += t.amount;
+                else if (title.startsWith('Level 3 Commission')) l3 += t.amount;
+            });
+            db.ref('users/' + phone).update({
+                teamEarningsL1: l1,
+                teamEarningsL2: l2,
+                teamEarningsL3: l3
+            });
+        }
         
         state.investments = data.investments ? Object.values(data.investments) : [];
         state.transactions = data.transactions ? Object.values(data.transactions) : [];
@@ -3544,6 +3568,12 @@ function signup() {
             password: pass,
             balance: APP_SETTINGS.registrationBonus,
             teamEarnings: 0,
+            // Per-level commission tracking — these are what the team detail
+            // page reads so the 3 levels are counted separately, not as a
+            // weighted split of teamEarnings. See creditReferralCommissions().
+            teamEarningsL1: 0,
+            teamEarningsL2: 0,
+            teamEarningsL3: 0,
             referrer: ref || "",
             refCode: generateRefCode(),
             createdAt: new Date().toISOString()
@@ -4687,18 +4717,45 @@ function populateTeamDetailHeader() {
     const l1 = state.user.team && state.user.team.lvl1 ? Object.keys(state.user.team.lvl1).length : 0;
     const l2 = state.user.team && state.user.team.lvl2 ? Object.keys(state.user.team.lvl2).length : 0;
     const l3 = state.user.team && state.user.team.lvl3 ? Object.keys(state.user.team.lvl3).length : 0;
-    const earnings = state.user.teamEarnings || 0;
-    // split earnings roughly per level by commission weight (20/5/2 = 74%/19%/7%)
-    const totalWeight = (APP_SETTINGS.referralLevel1 || 20) + (APP_SETTINGS.referralLevel2 || 5) + (APP_SETTINGS.referralLevel3 || 2);
-    const w1 = (APP_SETTINGS.referralLevel1 || 20) / totalWeight;
-    const w2 = (APP_SETTINGS.referralLevel2 || 5) / totalWeight;
-    const w3 = (APP_SETTINGS.referralLevel3 || 2) / totalWeight;
     document.getElementById('tdl1Count').innerText = l1;
     document.getElementById('tdl2Count').innerText = l2;
     document.getElementById('tdl3Count').innerText = l3;
-    document.getElementById('tdl1Amt').innerText = (earnings * w1).toFixed(2);
-    document.getElementById('tdl2Amt').innerText = (earnings * w2).toFixed(2);
-    document.getElementById('tdl3Amt').innerText = (earnings * w3).toFixed(2);
+
+    // Read the 3 levels' commission SEPARATELY — each counter shows the real
+    // commission earned at that level, not a weighted split of the total.
+    // Per-level fields are written by creditReferralCommissions() and back-
+    // filled from existing income transactions in syncUserData() for legacy
+    // accounts. The transaction-scan fallback below covers the rare race
+    // where the user opened the team page before the backfill finished.
+    let l1Amt = Number(state.user.teamEarningsL1) || 0;
+    let l2Amt = Number(state.user.teamEarningsL2) || 0;
+    let l3Amt = Number(state.user.teamEarningsL3) || 0;
+    const totalStored = (Number(state.user.teamEarnings) || 0);
+    const totalPerLevel = l1Amt + l2Amt + l3Amt;
+
+    if (totalPerLevel === 0 && totalStored > 0 && Array.isArray(state.transactions)) {
+        // One-shot reconstruction from existing commission transactions so
+        // legacy users don't see 0.00 on all 3 levels forever. The result is
+        // persisted to the user record so subsequent loads are O(1).
+        state.transactions.forEach(t => {
+            if (!t || t.type !== 'income' || typeof t.amount !== 'number') return;
+            const title = String(t.title || '');
+            if (title.startsWith('Level 1 Commission')) l1Amt += t.amount;
+            else if (title.startsWith('Level 2 Commission')) l2Amt += t.amount;
+            else if (title.startsWith('Level 3 Commission')) l3Amt += t.amount;
+        });
+        if ((l1Amt || l2Amt || l3Amt) && state.user.phone) {
+            db.ref('users/' + state.user.phone).update({
+                teamEarningsL1: l1Amt,
+                teamEarningsL2: l2Amt,
+                teamEarningsL3: l3Amt
+            });
+        }
+    }
+
+    document.getElementById('tdl1Amt').innerText = l1Amt.toFixed(2);
+    document.getElementById('tdl2Amt').innerText = l2Amt.toFixed(2);
+    document.getElementById('tdl3Amt').innerText = l3Amt.toFixed(2);
 }
 
 function renderTeamDetailLevel(level) {
@@ -5728,6 +5785,12 @@ function creditReferralCommissions(userPhone, baseAmount, sourceLabel) {
         });
         // Atomic teamEarnings credit — this is what the team page reads.
         db.ref(`users/${parentPhone}/teamEarnings`).transaction((cur) => {
+            return (Number(cur) || 0) + comm;
+        });
+        // Atomic per-level commission credit — the team detail page counts
+        // each of the 3 levels separately, so we maintain a dedicated counter
+        // for each one instead of trying to split the total at read time.
+        db.ref(`users/${parentPhone}/teamEarningsL${level}`).transaction((cur) => {
             return (Number(cur) || 0) + comm;
         });
 
