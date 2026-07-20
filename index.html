@@ -3379,6 +3379,13 @@ function syncUserData(phone) {
         const data = snapshot.val();
         state.user = data;
         state.balance = data.balance || 0;
+
+        // Backfill teamEarnings=0 for legacy accounts created before the field
+        // existed. One-time write — Firebase only fires the listener again if
+        // the value actually changes, so this is safe to run on every login.
+        if (typeof data.teamEarnings !== 'number') {
+            db.ref('users/' + phone + '/teamEarnings').set(0);
+        }
         
         state.investments = data.investments ? Object.values(data.investments) : [];
         state.transactions = data.transactions ? Object.values(data.transactions) : [];
@@ -3536,6 +3543,7 @@ function signup() {
             phone: phone,
             password: pass,
             balance: APP_SETTINGS.registrationBonus,
+            teamEarnings: 0,
             referrer: ref || "",
             refCode: generateRefCode(),
             createdAt: new Date().toISOString()
@@ -5706,23 +5714,31 @@ function creditReferralCommissions(userPhone, baseAmount, sourceLabel) {
 
     // Credit `comm` ETB to `parentPhone`'s balance, teamEarnings, and log
     // an income transaction. No-op if the user record is missing.
+    //
+    // Uses Firebase .transaction() for the read-modify-write on balance and
+    // teamEarnings — the old .once() + .set() pattern had a race condition
+    // where two commissions credited in quick succession would both read the
+    // same stale value, and the second .set() would overwrite the first,
+    // causing the team page to "not count" some commissions.
     const creditTo = (parentPhone, level, userData, comm) => {
         if (!comm || comm <= 0) return;
-        db.ref('users/' + parentPhone).once('value', (pSnap) => {
-            if (!pSnap.exists()) return;
-            const pData = pSnap.val();
-            db.ref(`users/${parentPhone}/balance`).set((pData.balance || 0) + comm);
-            db.ref(`users/${parentPhone}/teamEarnings`).set((pData.teamEarnings || 0) + comm);
+        // Atomic balance credit.
+        db.ref(`users/${parentPhone}/balance`).transaction((bal) => {
+            return (Number(bal) || 0) + comm;
+        });
+        // Atomic teamEarnings credit — this is what the team page reads.
+        db.ref(`users/${parentPhone}/teamEarnings`).transaction((cur) => {
+            return (Number(cur) || 0) + comm;
+        });
 
-            const txnRef = db.ref(`users/${parentPhone}/transactions`).push();
-            txnRef.set({
-                id: txnRef.key,
-                type: 'income',
-                title: labelFor(level, userData),
-                amount: comm,
-                date: new Date().toISOString(),
-                status: 'completed'
-            });
+        const txnRef = db.ref(`users/${parentPhone}/transactions`).push();
+        txnRef.set({
+            id: txnRef.key,
+            type: 'income',
+            title: labelFor(level, userData),
+            amount: comm,
+            date: new Date().toISOString(),
+            status: 'completed'
         });
     };
 
