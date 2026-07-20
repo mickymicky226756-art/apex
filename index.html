@@ -1131,6 +1131,91 @@
         .txn-card-v2.income .txn-card-amt .num { color: #d97706; }
         .txn-card-v2.investment .txn-card-amt .num { color: #7c3aed; }
 
+        /* ---------- SUCCESSFUL WITHDRAWALS (Alone Section) ---------- */
+        .txn-success-section {
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1.5px solid #bbf7d0;
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.08);
+        }
+        .txn-success-section .sec-head {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.78rem; font-weight: 800; color: var(--primary-dark);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 12px; padding-bottom: 10px;
+            border-bottom: 1px solid rgba(22, 163, 74, 0.2);
+        }
+        .txn-success-section .sec-head i {
+            color: var(--primary); font-size: 1rem;
+        }
+        .txn-success-section .sec-head .sec-count {
+            margin-left: auto;
+            background: var(--primary); color: white;
+            font-size: 0.65rem; font-weight: 800;
+            padding: 2px 8px; border-radius: 10px;
+            letter-spacing: 0.3px;
+        }
+        .txn-card-success {
+            background: white;
+            border: 1.5px solid var(--primary);
+            border-radius: 14px;
+            padding: 14px 14px 14px 16px;
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+            position: relative; overflow: hidden;
+            transition: 0.2s;
+        }
+        .txn-card-success:last-child { margin-bottom: 0; }
+        .txn-card-success:active { transform: scale(0.99); }
+        .txn-card-success::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 4px; background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            border-radius: 0 4px 4px 0;
+        }
+        .txn-card-success .txn-card-icon {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .txn-card-success .txn-card-info { flex: 1; min-width: 0; }
+        .txn-card-success .txn-card-title {
+            font-size: 0.95rem; font-weight: 800; color: var(--primary-dark);
+            margin-bottom: 3px;
+            display: flex; align-items: center; gap: 6px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .txn-card-success .txn-card-title .pill.success {
+            background: var(--primary); color: white;
+            font-size: 0.58rem; font-weight: 800;
+            padding: 2px 7px; border-radius: 5px;
+            text-transform: uppercase; letter-spacing: 0.3px;
+            flex-shrink: 0;
+        }
+        .txn-card-success .txn-card-meta {
+            font-size: 0.7rem; color: var(--text-muted); font-weight: 600;
+            display: flex; align-items: center; gap: 5px;
+            flex-wrap: wrap;
+        }
+        .txn-card-success .txn-card-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-soft); }
+        .txn-card-success .txn-card-meta .net-line {
+            color: var(--primary-dark); font-weight: 800;
+        }
+        .txn-card-success .txn-card-amt { text-align: right; flex-shrink: 0; min-width: 90px; }
+        .txn-card-success .txn-card-amt .num {
+            font-size: 1.05rem; font-weight: 800; color: var(--primary);
+            letter-spacing: -0.3px;
+        }
+        .txn-card-success .txn-card-amt .lbl {
+            font-size: 0.6rem; color: var(--text-muted); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px;
+        }
+
         .txn-empty-v2 {
             text-align: center; padding: 50px 20px 30px;
             color: var(--text-muted);
@@ -2174,6 +2259,262 @@
             body { max-width: 480px; margin: 0 auto; background: #0f172a; }
             body::before { content: ''; position: fixed; inset: 0; background: #0f172a; z-index: -1; }
             .app-frame { background: var(--bg-body); min-height: 100vh; }
+        }
+
+        /* ============================================================
+           MOBILE / PHONE FIXES — ADMIN PANEL & FORMS
+           Activates on screens <= 767px. Default styles above are
+           desktop-first; these overrides make the admin panel usable
+           on a phone.
+           ============================================================ */
+        @media (max-width: 767px) {
+
+            /* Stop the page from triggering iOS Safari auto-zoom on
+               input focus — requires >= 16px font on form controls. */
+            #adminApp input,
+            #adminApp select,
+            #adminApp textarea,
+            .plan-form-grid input,
+            .plan-form-grid select,
+            .input-group input,
+            .input-group select,
+            .input-group textarea {
+                font-size: 16px !important;
+            }
+
+            /* Tighter section padding on phones */
+            #adminApp .view-section { padding: 14px !important; }
+
+            /* ---------- ADMIN TAB BAR ----------
+               13 tabs in a single row is unmanageable on a phone.
+               Wrap to multiple rows, give each tab a real touch
+               target (>= 44px), shorten labels where useful, and
+               keep the active state visible. */
+            .admin-tab-bar {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+                padding: 6px;
+                background: #f1f5f9;
+                border-radius: 14px;
+                overflow-x: visible;
+                -webkit-overflow-scrolling: auto;
+            }
+            .admin-tab-bar .txn-tab {
+                font-size: 0.72rem;
+                padding: 10px 6px;
+                min-height: 44px;
+                border-radius: 8px;
+                text-align: center;
+                justify-content: center;
+                background: white;
+                border: 1px solid var(--border-soft);
+                white-space: nowrap;
+            }
+            .admin-tab-bar .txn-tab i {
+                margin-right: 4px;
+                font-size: 0.85rem;
+            }
+            .admin-tab-bar .txn-tab.active {
+                background: var(--primary);
+                color: white;
+                border-color: var(--primary);
+                box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+            }
+            .admin-tab-bar .txn-tab.active::after { display: none; }
+
+            /* ---------- ADMIN STAT CARDS ----------
+               2 columns is fine on most phones; just tighten the gap. */
+            #adminApp section > div[style*="grid-template-columns: 1fr 1fr"] {
+                gap: 8px !important;
+            }
+            .admin-stat-card { padding: 12px 10px; }
+            .admin-stat-icon {
+                width: 36px; height: 36px;
+                font-size: 0.95rem;
+            }
+            .admin-stat-value { font-size: 1.15rem; }
+            .admin-stat-label { font-size: 0.62rem; }
+
+            /* ---------- FORMS ----------
+               Collapse 2-column form grids to 1 column on phones so
+               inputs aren't squeezed, and bump tap-target height. */
+            .plan-form-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+            .input-group label {
+                font-size: 0.78rem;
+            }
+            .input-group input,
+            .input-group select,
+            .input-group textarea {
+                padding: 13px 14px;
+                min-height: 44px;
+            }
+            .save-btn.primary {
+                width: 100%;
+                padding: 14px;
+                font-size: 0.9rem;
+                min-height: 48px;
+            }
+
+            /* ---------- ADMIN REQUEST CARDS (Deposits / Withdrawals) ----------
+               The head row (avatar + info + amount) can wrap on
+               narrow screens; let it stack neatly. */
+            .admin-req-card { padding: 14px; }
+            .admin-req-head { flex-wrap: wrap; gap: 8px; }
+            .admin-req-amount { font-size: 1.05rem; }
+            .admin-req-meta { font-size: 0.78rem; padding: 10px; }
+            .admin-req-actions { flex-wrap: wrap; }
+            .admin-req-actions .admin-btn {
+                min-height: 44px;
+                padding: 12px;
+                font-size: 0.78rem;
+            }
+
+            /* ---------- ADMIN PAYMENT METHOD CARDS ----------
+               Logo + body + actions in a single row is tight on
+               phones. Stack body below logo and put actions on
+               their own row. */
+            .admin-pm-card {
+                flex-wrap: wrap;
+                padding: 12px;
+                gap: 10px;
+            }
+            .admin-pm-logo {
+                width: 48px; height: 48px;
+                font-size: 1.1rem;
+            }
+            .admin-pm-body {
+                flex: 1 1 calc(100% - 60px);
+                min-width: 0;
+            }
+            .admin-pm-name { font-size: 0.9rem; }
+            .admin-pm-details { font-size: 0.78rem; }
+            .admin-pm-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            .admin-pm-actions .admin-btn {
+                flex: 1 1 calc(50% - 4px);
+                min-height: 44px;
+                padding: 12px 8px;
+                font-size: 0.72rem;
+            }
+
+            /* ---------- ADMIN PLAN CARDS ----------
+               The 3-col plan stats grid stays, but the head row
+               needs to allow wrapping when the name is long. */
+            .admin-plan-head { flex-wrap: wrap; gap: 10px; }
+            .admin-plan-thumb { width: 48px; height: 48px; }
+            .admin-plan-name { font-size: 0.9rem; }
+            .admin-plan-stats { font-size: 0.7rem; }
+            .admin-plan-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .admin-plan-grid .ap-stat { padding: 8px 4px; }
+            .admin-plan-grid .ap-stat .l { font-size: 0.55rem; }
+            .admin-plan-grid .ap-stat .v { font-size: 0.78rem; }
+            .admin-plan-actions .admin-btn {
+                min-height: 44px;
+                padding: 12px 8px;
+                font-size: 0.72rem;
+            }
+
+            /* ---------- ANALYTICS / SETTINGS CARDS ----------
+               Generic settings-card padding is too big on phones. */
+            .settings-card { padding: 14px; }
+            .settings-card h4 { font-size: 0.95rem; }
+
+            /* ---------- HEADER ON ADMIN ----------
+               Keep the logout reachable but compact. */
+            #adminApp header {
+                padding: 12px 14px;
+            }
+            #adminApp .logo { font-size: 1.15rem; }
+            #adminApp .logo-icon { width: 32px; height: 32px; }
+            #adminApp .top-balance {
+                font-size: 0.78rem;
+                padding: 8px 12px;
+            }
+
+            /* ---------- PM LOGO PREVIEW ROW ----------
+               Logo preview + helper text needs to stack on phones. */
+            .pm-logo-preview { width: 56px; height: 56px; }
+
+            /* ---------- GENERIC ADMIN BUTTONS ----------
+               Make all admin buttons meet the 44px touch target. */
+            .admin-btn { min-height: 44px; }
+
+            /* ---------- ANALYTICS GRID (auto-fit min 160px) ----------
+               Force 2 columns on phones so cards are readable. */
+            .an-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 8px !important;
+            }
+            .an-card { padding: 12px 10px; }
+            .an-card .an-label { font-size: 0.62rem; }
+            .an-card .an-value { font-size: 0.95rem; }
+            .an-card .an-sub { font-size: 0.65rem; }
+
+            /* ---------- CHART BAR ROWS ----------
+               The day/track/amount row can overflow on narrow phones.
+               Shrink the labels and let the bar flex. */
+            .bar-row { font-size: 0.7rem; gap: 6px; }
+            .bar-row .bar-day { width: 42px; }
+            .bar-row .bar-amt { width: 64px; font-size: 0.7rem; }
+
+            /* ---------- USER SEARCH BAR ----------
+               Stack search + clear button on small screens. */
+            .admin-search-bar { flex-wrap: wrap; padding: 6px; }
+            .admin-search-bar input {
+                flex: 1 1 100%;
+                font-size: 16px !important;
+                min-height: 44px;
+            }
+            .admin-search-bar .admin-btn {
+                flex: 1 1 auto;
+                min-height: 44px;
+            }
+
+            /* ---------- USER LIST ROWS ----------
+               Balance modifier row (input + add/deduct) stacks neatly;
+               row-actions buttons stay 2-3 per row with proper tap targets. */
+            .user-row-actions .admin-btn {
+                flex: 1 1 calc(50% - 4px);
+                min-height: 44px;
+                padding: 10px 6px;
+                font-size: 0.7rem;
+            }
+            .user-row-actions .admin-btn i { margin-right: 4px; }
+
+            /* ---------- LEADER ROWS ----------
+               Slightly tighter so long names don't push the amount off. */
+            .leader-row { gap: 8px; }
+            .leader-name { font-size: 0.85rem; }
+            .leader-amt { font-size: 0.85rem; }
+
+            /* ---------- GIFT CODE / BROADCAST / SETTINGS FORMS ----------
+               Already covered by .plan-form-grid above, but make sure
+               textarea and number inputs are full-width and tappable. */
+            .settings-card input,
+            .settings-card select,
+            .settings-card textarea {
+                font-size: 16px !important;
+                min-height: 44px;
+                padding: 12px 14px;
+            }
+            .settings-card textarea { min-height: 96px; }
+
+            /* ---------- H3 HEADINGS ----------
+               A bit smaller on phones so they don't dominate the screen. */
+            #adminContent h3 { font-size: 0.9rem !important; }
+
+            /* ---------- ADMIN CONTENT WIDTH ----------
+               Make sure the admin content uses the full phone width
+               with comfortable horizontal padding. */
+            #adminApp #adminContent {
+                padding: 0 2px;
+            }
         }
     </style>
 </head>
@@ -5139,15 +5480,66 @@ function renderTransactions() {
 
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // Group by day
+    // --- Pull out SUCCESSFUL withdrawals (status = completed) and render
+    //     them in a dedicated "alone" section at the top, titled
+    //     "Success Withdrawal". This keeps each approved withdrawal as its
+    //     own record, separated from the regular transaction flow.
+    const successWithdrawals = filtered.filter(t => {
+        const cat = getTxnCategory(t);
+        return cat === 'withdraw' && t.status === 'completed';
+    });
+    // The remaining list (everything except the success withdrawals)
+    const remaining = filtered.filter(t => {
+        const cat = getTxnCategory(t);
+        return !(cat === 'withdraw' && t.status === 'completed');
+    });
+
+    let html = '';
+
+    // --- Successful Withdrawals: alone section (only when viewing 'all' or 'withdraw') ---
+    if (successWithdrawals.length > 0 && (currentTxnFilter === 'all' || currentTxnFilter === 'withdraw')) {
+        html += `<div class="txn-success-section">
+            <div class="sec-head">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Success Withdrawals</span>
+                <span class="sec-count">${successWithdrawals.length}</span>
+            </div>`;
+        successWithdrawals.forEach(t => {
+            const fee = t.fee || 0;
+            const net = (typeof t.netReceived === 'number') ? t.netReceived : Math.max(0, (t.amount || 0) - fee);
+            const metaTime = new Date(t.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const account = t.accountMethod ? (METHOD_LABELS[t.accountMethod] || t.accountMethod) : '';
+            const successDate = t.successAt ? new Date(t.successAt) : new Date(t.date);
+            const successLbl = fmtDateLabel(successDate.toISOString());
+            const acctLine = t.account ? `<span class="dot"></span><span>To: ${escapeHtml(account)} ${escapeHtml(t.account)}</span>` : '';
+            const feeLine = fee > 0 ? `<span class="dot"></span><span class="net-line">Net received: ETB ${net.toFixed(2)}</span>` : '';
+            html += `
+            <div class="txn-card-success">
+                <div class="txn-card-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="txn-card-info">
+                    <div class="txn-card-title">Success Withdrawal<span class="pill success">Approved</span></div>
+                    <div class="txn-card-meta">
+                        <span>${successLbl.date} · ${successLbl.time}</span>
+                        ${acctLine}
+                        ${feeLine}
+                    </div>
+                </div>
+                <div class="txn-card-amt">
+                    <div class="num">+ ETB ${net.toFixed(2)}</div>
+                    <div class="lbl">Received</div>
+                </div>
+            </div>`;
+        });
+        html += `</div>`;
+    }
+
+    // Group by day (remaining transactions, excluding the success withdrawals)
     const groups = {};
-    filtered.forEach(t => {
+    remaining.forEach(t => {
         const key = getDayKey(t.date);
         if (!groups[key]) groups[key] = [];
         groups[key].push(t);
     });
-
-    let html = '';
     Object.keys(groups).forEach(dayKey => {
         const txns = groups[dayKey];
         let dayIn = 0, dayOut = 0;
@@ -5852,6 +6244,12 @@ function adminRejectDeposit(userPhone, txnId) {
 
 function adminApproveWithdrawal(userPhone, txnId) {
     db.ref(`users/${userPhone}/transactions/${txnId}/status`).set('completed').then(() => {
+        // Also rename the title to "Success Withdrawal" so it shows up
+        // that way on the user's transaction side (and the record is
+        // surfaced alone in its own dedicated success section).
+        db.ref(`users/${userPhone}/transactions/${txnId}/title`).set('Success Withdrawal').then(() => {
+            db.ref(`users/${userPhone}/transactions/${txnId}/successAt`).set(new Date().toISOString());
+        });
         showToast("Paid state confirmed.");
     });
 }
