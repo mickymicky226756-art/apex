@@ -4800,7 +4800,33 @@ function renderTeamData() {
     document.getElementById('lvl2Count').innerText = l2;
     document.getElementById('lvl3Count').innerText = l3;
 
-    document.getElementById('teamEarnings').innerText = (state.user.teamEarnings || 0).toFixed(2);
+    // Total earned from team — the source of truth is now the sum of the 3
+    // per-level commission fields (teamEarningsL1+L2+L3), NOT teamEarnings.
+    // Reason: for legacy users the per-level fields get backfilled from real
+    // commission transactions, but the legacy teamEarnings total can be 0
+    // (e.g. if the field was missing on the account), which made this card
+    // show 0.00 even when the user had actually earned commission. We display
+    // the per-level sum and, if it disagrees with teamEarnings, write the
+    // corrected total back to the user record so admin/leaderboard views
+    // that still read teamEarnings stay accurate going forward.
+    const l1Amt = Number(state.user.teamEarningsL1) || 0;
+    const l2Amt = Number(state.user.teamEarningsL2) || 0;
+    const l3Amt = Number(state.user.teamEarningsL3) || 0;
+    const perLevelTotal = l1Amt + l2Amt + l3Amt;
+    const storedTotal = Number(state.user.teamEarnings) || 0;
+    const total = perLevelTotal > 0 ? perLevelTotal : storedTotal;
+
+    document.getElementById('teamEarnings').innerText = total.toFixed(2);
+
+    // Reconcile: if the per-level sum disagrees with the stored teamEarnings
+    // by more than 0.005 ETB, persist the corrected total so the rest of the
+    // app (admin tables, leaderboard, profile) sees the right number. This
+    // self-heals legacy data on first render.
+    if (perLevelTotal > 0 && Math.abs(perLevelTotal - storedTotal) > 0.005 &&
+        state.user.phone && typeof db !== 'undefined') {
+        state.user.teamEarnings = perLevelTotal;
+        db.ref('users/' + state.user.phone + '/teamEarnings').set(perLevelTotal);
+    }
 
     updateReferralLink();
 }
@@ -5349,7 +5375,10 @@ function switchView(viewId) {
     }
 
     if (viewId === 'team' || viewId === 'team-detail') {
-        updateReferralLink();
+        // Always re-render team data on entry so the totals and per-level
+        // counts aren't stale. updateReferralLink() is called inside
+        // renderTeamData() so we don't need to call it again here.
+        renderTeamData();
     }
 
     if (viewId === 'transactions' && currentTxnFilter !== 'deposit' && currentTxnFilter !== 'withdraw') {
