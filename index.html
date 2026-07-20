@@ -3457,9 +3457,17 @@ function syncAdminData() {
         }
         document.getElementById('adminTotalUsers').innerText = userCount;
         document.getElementById('adminTotalBalance').innerText = 'ETB ' + totalBal.toFixed(2);
-        
+
         syncAdminPendingCounts();
-        renderAdminContent();
+        // Don't re-render the admin content on every user-data change. The
+        // users listener fires whenever ANY user does anything (deposit,
+        // check-in, invest, etc.), which would wipe the payment-method form
+        // mid-typing. Payment methods live in settings/paymentMethods and
+        // re-render on their own trigger. Pending counts above are updated
+        // independently and don't need a full re-render.
+        if (activeAdminTab !== 'paymentmethods') {
+            renderAdminContent();
+        }
     });
 }
 
@@ -6214,6 +6222,20 @@ function adminDeletePlan(planId) {
 
 // ==== ADMIN DYNAMIC PAYMENT METHODS OPERATIONS ====
 function renderAdminPaymentMethods() {
+    // Preserve form input state across re-renders so the form doesn't wipe
+    // while the admin is typing (e.g. when the users-list listener fires).
+    const pmFieldIds = ['newPmName','newPmBank','newPmAccount','newPmHolder','newPmNote','newPmLogo','newPmOrder'];
+    const preserved = {};
+    const activeEl = document.activeElement;
+    const hadFocusInsideForm = activeEl && pmFieldIds.includes(activeEl.id);
+    const focusId = hadFocusInsideForm ? activeEl.id : null;
+    const selStart = hadFocusInsideForm ? activeEl.selectionStart : null;
+    const selEnd = hadFocusInsideForm ? activeEl.selectionEnd : null;
+    pmFieldIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) preserved[id] = el.value;
+    });
+
     const methods = (APP_SETTINGS && APP_SETTINGS.paymentMethods) ? APP_SETTINGS.paymentMethods : [];
     // Sort by order ascending for stable display
     const sorted = [...methods].sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -6301,6 +6323,19 @@ function renderAdminPaymentMethods() {
         });
     }
     document.getElementById('adminContent').innerHTML = html;
+    // Restore preserved form values + focus + cursor position so the admin
+    // doesn't lose what they were typing when this view re-renders.
+    pmFieldIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && preserved[id] !== undefined) el.value = preserved[id];
+    });
+    if (focusId) {
+        const fEl = document.getElementById(focusId);
+        if (fEl) {
+            fEl.focus();
+            try { if (selStart != null) fEl.setSelectionRange(selStart, selEnd); } catch (e) {}
+        }
+    }
     // Refresh the logo preview after re-render
     updatePmLogoPreview();
 }
@@ -6346,6 +6381,15 @@ function adminCreatePaymentMethod() {
     db.ref('settings/paymentMethods').set(updated).then(() => {
         APP_SETTINGS.paymentMethods = updated;
         showToast("Payment method added!");
+        // Clear form fields BEFORE the re-render so the preservation logic
+        // inside renderAdminPaymentMethods restores an empty form (fresh
+        // entry, ready for the next method).
+        ['newPmName','newPmBank','newPmAccount','newPmHolder','newPmNote','newPmLogo'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        const orderEl = document.getElementById('newPmOrder');
+        if (orderEl) orderEl.value = updated.length;
         renderAdminPaymentMethods();
     }).catch((err) => {
         showToast("Failed to save: " + (err.message || 'unknown error'));
