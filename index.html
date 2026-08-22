@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -2642,7 +2642,7 @@
         <div class="lang-switcher" id="langSwitcher">
             <button type="button" class="lang-switcher-btn" id="langSwitcherBtn" aria-haspopup="true" aria-expanded="false">
                 <i class="fa-solid fa-globe globe"></i>
-                <span id="langSwitcherLabel">EN</span>
+                <span id="langSwitcherLabel">বাংলা</span>
                 <i class="fa-solid fa-chevron-down chev"></i>
             </button>
             <div class="lang-switcher-menu" role="menu" aria-label="Select language">
@@ -3365,7 +3365,7 @@
                 <div class="menu-item" onclick="openLangModal()">
                     <div class="m-icon"><i class="fa-solid fa-globe"></i></div>
                     <div class="m-text" data-i18n="profile.language">Language</div>
-                    <span id="profileLangLabel" style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; margin-right: 8px;">EN</span>
+                    <span id="profileLangLabel" style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; margin-right: 8px;">বাংলা</span>
                     <i class="fa-solid fa-chevron-right m-arrow"></i>
                 </div>
                 <div class="menu-item" onclick="switchView('about')"><div class="m-icon"><i class="fa-solid fa-circle-info"></i></div><div class="m-text" data-i18n="profile.menu.about">About Us</div><i class="fa-solid fa-chevron-right m-arrow"></i></div>
@@ -8943,10 +8943,13 @@ adminCreateGiftCode = function() {
     ];
 
     function getLang() {
+        // Default to Bangla (bn) for first-time visitors. Users who explicitly
+        // pick English (en) in the language switcher will keep that choice
+        // because their selection is persisted to localStorage.
         try {
             const v = localStorage.getItem(LANG_KEY);
-            return (v === 'bn' || v === 'en') ? v : 'en';
-        } catch (e) { return 'en'; }
+            return (v === 'bn' || v === 'en') ? v : 'bn';
+        } catch (e) { return 'bn'; }
     }
 
     function setLang(lang) {
