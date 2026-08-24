@@ -1758,6 +1758,143 @@
             background: white; border-radius: 16px; padding: 20px;
             margin-bottom: 16px; box-shadow: var(--shadow-soft);
         }
+
+        /* Nayapay-style cashier (merged Choose Bank + Copy Account + TrxID) */
+        .nayapay-header {
+            background: linear-gradient(135deg, #1f6e3d, #16a34a);
+            color: white;
+            padding: 20px 18px;
+            border-radius: 0 0 18px 18px;
+            margin: -20px -20px 16px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .nayapay-header .lft { display: flex; flex-direction: column; }
+        .nayapay-header .lbl { font-size: 0.78rem; opacity: 0.92; font-weight: 600; }
+        .nayapay-header .amt {
+            font-size: 1.7rem; font-weight: 800; margin-top: 4px;
+            letter-spacing: -0.5px;
+        }
+        .nayapay-header .rgt { text-align: right; }
+        .nayapay-header .rgt .lbl { font-size: 0.78rem; opacity: 0.92; font-weight: 600; }
+        .nayapay-header .rgt .val {
+            font-size: 0.85rem; font-weight: 700; margin-top: 4px;
+            font-family: 'Courier New', monospace; word-break: break-all;
+        }
+        .nayapay-instructions {
+            border: 1.5px solid #16a34a; border-radius: 14px;
+            padding: 14px 16px; margin-bottom: 18px;
+            background: #f0fdf4; color: #0f3a22;
+        }
+        .nayapay-instructions li {
+            font-size: 0.85rem; line-height: 1.55; font-weight: 600;
+            margin-bottom: 6px; padding-left: 4px;
+        }
+        .nayapay-instructions li b { color: #b91c1c; font-weight: 800; }
+        .nayapay-step {
+            display: flex; align-items: center; gap: 10px;
+            margin: 18px 0 10px; padding: 0 2px;
+        }
+        .nayapay-step .num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: #16a34a; color: white; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.78rem; flex-shrink: 0;
+        }
+        .nayapay-step .lbl { font-size: 0.95rem; font-weight: 800; color: var(--text-main); }
+        .nayapay-step .bilingual { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: 4px; }
+
+        /* Choose-bank cards (Nayapay style) */
+        .nayapay-bank-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+        }
+        .nayapay-bank-card {
+            background: white; border: 2px solid var(--border);
+            border-radius: 14px; padding: 14px 12px;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 8px; cursor: pointer; transition: 0.2s;
+            box-shadow: var(--shadow-soft); min-height: 96px; position: relative;
+        }
+        .nayapay-bank-card:active { transform: scale(0.98); }
+        .nayapay-bank-card.selected {
+            border-color: #ef4444; background: #fff5f5;
+        }
+        .nayapay-bank-card .nk-logo {
+            width: 52px; height: 52px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; font-weight: 800; color: white;
+        }
+        .nayapay-bank-card .nk-logo.bkash { background: #e2136e; }
+        .nayapay-bank-card .nk-logo.nagad { background: linear-gradient(135deg, #f97316, #dc2626); }
+        .nayapay-bank-card .nk-name { font-weight: 800; color: var(--text-main); font-size: 0.95rem; }
+        .nayapay-bank-card .nk-status {
+            font-size: 0.7rem; color: #16a34a; font-weight: 800; text-transform: capitalize;
+        }
+        .nayapay-bank-card .nk-radio {
+            position: absolute; top: 8px; right: 8px;
+            width: 18px; height: 18px; border-radius: 50%;
+            border: 2px solid var(--border); background: white;
+        }
+        .nayapay-bank-card.selected .nk-radio { border-color: #ef4444; }
+        .nayapay-bank-card.selected .nk-radio::after {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: #ef4444; margin: 3px auto 0; display: block;
+        }
+
+        /* Copy-account card (Nayapay style) */
+        .nayapay-copy-card {
+            background: white; border: 1px solid var(--border-soft);
+            border-radius: 14px; box-shadow: var(--shadow-soft);
+            padding: 4px 16px;
+        }
+        .nayapay-copy-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 0; border-bottom: 1px solid var(--border-soft);
+        }
+        .nayapay-copy-row:last-child { border-bottom: none; }
+        .nayapay-copy-row .meta {
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .nayapay-copy-row .meta .lbl {
+            font-size: 0.78rem; color: var(--text-muted); font-weight: 700;
+        }
+        .nayapay-copy-row .meta .val {
+            font-size: 1.05rem; color: var(--text-main); font-weight: 800;
+        }
+        .nayapay-copy-row .meta .val.acct {
+            font-family: 'Courier New', monospace; letter-spacing: 0.5px;
+        }
+        .nayapay-copy-row .meta .val.red { color: #b91c1c; }
+        .nayapay-copy-btn {
+            background: #ef4444; color: white; border: none;
+            padding: 10px 22px; border-radius: 999px;
+            font-size: 0.85rem; font-weight: 800; cursor: pointer;
+            font-family: inherit; min-width: 76px;
+        }
+        .nayapay-copy-btn:active { transform: scale(0.96); }
+
+        /* TrxID input + submit (Nayapay style) */
+        .nayapay-trxid-input {
+            width: 100%; padding: 14px 18px;
+            border: 1.5px solid var(--border); border-radius: 999px;
+            font-size: 0.95rem; font-weight: 600; outline: none;
+            background: white; color: var(--text-main);
+            font-family: inherit;
+        }
+        .nayapay-trxid-input:focus { border-color: var(--primary); }
+        .nayapay-trxid-input::placeholder { color: var(--text-soft); font-weight: 500; }
+        .nayapay-helper {
+            font-size: 0.85rem; color: #0ea5e9; font-weight: 700;
+            margin: 12px 0 18px; cursor: pointer; line-height: 1.5;
+        }
+        .nayapay-submit {
+            width: 100%; padding: 16px;
+            background: #ef4444; color: white; border: none;
+            border-radius: 999px; font-size: 1.05rem;
+            font-weight: 800; cursor: pointer; font-family: inherit;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+        .nayapay-submit:active { transform: translateY(2px); }
+        .nayapay-submit:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
         .paynow-cashier-head {
             display: flex; align-items: center; justify-content: space-between;
             padding-bottom: 14px; border-bottom: 1px solid var(--border-soft);
@@ -2792,72 +2929,7 @@
     </div>
 </div>
 
-<!-- Bank Selection Notice Modal -->
-<div id="bankNoticeModal" class="modal bank-notice-modal">
-    <div class="modal-content">
-        <h3 data-i18n="deposit.bankNotice.title">Bank Selection Notice</h3>
-        <p data-i18n="deposit.bankNotice.body">Please select your bank carefully! You can only use the same bank account to make the payment.</p>
-        <div class="bank-notice-warning" data-i18n="deposit.bankNotice.warning">Do not transfer from a different bank, otherwise your funds will be lost!</div>
-        <div class="bank-notice-example">
-            <div class="ex-title" data-i18n="deposit.bankNotice.exampleTitle">Example:</div>
-            <span data-i18n-html="deposit.bankNotice.exampleBody">If you select <b>CBE Bank</b>, you must transfer using your <b>CBE Bank account</b>. You cannot use Awash Bank or any other bank.</span>
-        </div>
-        <button class="btn-understand" onclick="closeBankNotice()" data-i18n="deposit.bankNotice.understand">I understand</button>
-    </div>
-</div>
-
-<!-- Important Notice Modal -->
-<div id="importantNoticeModal" class="modal important-notice-modal">
-    <div class="modal-content">
-        <div class="in-head">
-            <div class="warn-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <h3 data-i18n="deposit.impNotice.title">Important Notice</h3>
-        </div>
-        <ol>
-            <li data-i18n-html="deposit.impNotice.l1">When making payment, <b>please be sure to fill in the order code!</b></li>
-            <li data-i18n-html="deposit.impNotice.l2">After the payment is successful, <b>you must come back here and click the "I have completed the bank transfer" button below to submit the transaction ID.</b> Only then will your funds reach your account!</li>
-            <li data-i18n-html="deposit.impNotice.l3">Please do not <u>share your successful payment SMS, app screenshot, PDF or any other materials containing transaction information</u> in the group or with anyone else, otherwise your funds will be lost! For any questions, please contact official customer service within the app.</li>
-        </ol>
-        <button class="read-btn" id="readCarefullyBtn" disabled onclick="acceptImportantNotice()"><span data-i18n="deposit.impNotice.readBtn">Please read carefully (1s)</span></button>
-    </div>
-</div>
-
-<!-- Confirm Transaction Bottom Sheet -->
-<div class="sheet-overlay" id="sheetOverlay" onclick="closeConfirmTxnSheet()"></div>
-<div class="sheet" id="confirmTxnSheet">
-    <div class="sheet-handle"></div>
-    <h4 data-i18n="sheet.title">Please choose how to confirm your transaction</h4>
-    <div class="sheet-tabs">
-        <button class="sheet-tab active" data-tab="txn" onclick="switchConfirmTab('txn', this)"><span data-i18n="sheet.tab.txn">Submit Transaction ID</span></button>
-        <button class="sheet-tab" data-tab="sender" onclick="switchConfirmTab('sender', this)"><span data-i18n="sheet.tab.sender">Submit Sender Name</span></button>
-        <button class="sheet-tab" data-tab="sms" onclick="switchConfirmTab('sms', this)"><span data-i18n="sheet.tab.sms">Submit SMS Screenshot</span></button>
-    </div>
-    <div class="sheet-tab-pane" id="sheetPaneTxn">
-        <div class="sheet-input-label" data-i18n="sheet.label.txn">Please fill in the transaction ID</div>
-        <input type="text" class="sheet-input" id="sheetTxnInput" data-i18n-ph="sheet.placeholder.txn" placeholder="12 characters, starting with FT, example: FT26180F0KJJ" maxlength="64">
-        <div class="sheet-helper" onclick="showToast(window.t ? window.t('sheet.toast.txn') : 'Open your banking app to find the transaction ID.')">
-            <i class="fa-solid fa-circle-question"></i> <span data-i18n="sheet.helper.txn">How to find your transaction ID? Click here »</span>
-        </div>
-        <div class="sheet-warning"><i class="fa-solid fa-circle-exclamation"></i> <span data-i18n="sheet.warning.txn">Submit the details to confirm your transaction faster.</span></div>
-    </div>
-    <div class="sheet-tab-pane" id="sheetPaneSender" style="display:none;">
-        <div class="sheet-input-label" data-i18n="sheet.label.sender">Please fill in the sender name</div>
-        <input type="text" class="sheet-input" id="sheetSenderInput" data-i18n-ph="sheet.placeholder.sender" placeholder="Enter the name on the sender account" maxlength="80">
-        <div class="sheet-helper" onclick="showToast(window.t ? window.t('sheet.toast.sender') : 'The name registered to the bank account you used to send the money.')">
-            <i class="fa-solid fa-circle-question"></i> <span data-i18n="sheet.helper.sender">Whose name should I write? Click here »</span>
-        </div>
-        <div class="sheet-warning"><i class="fa-solid fa-circle-exclamation"></i> <span data-i18n="sheet.warning.txn">Submit the details to confirm your transaction faster.</span></div>
-    </div>
-    <div class="sheet-tab-pane" id="sheetPaneSms" style="display:none;">
-        <div class="sheet-input-label" data-i18n="sheet.label.sms">Upload the SMS screenshot</div>
-        <input type="file" class="sheet-input" id="sheetSmsInput" accept="image/*">
-        <div class="sheet-helper" onclick="showToast(window.t ? window.t('sheet.toast.sms') : 'Take a screenshot of the SMS received from the bank after the transfer.')">
-            <i class="fa-solid fa-circle-question"></i> <span data-i18n="sheet.helper.sms">How to capture the SMS? Click here »</span>
-        </div>
-        <div class="sheet-warning"><i class="fa-solid fa-circle-exclamation"></i> <span data-i18n="sheet.warning.txn">Submit the details to confirm your transaction faster.</span></div>
-    </div>
-    <button class="btn-recharge" id="sheetSubmitBtn" onclick="submitConfirmTxn()" data-i18n="sheet.submit">Submit Transaction ID</button>
-</div>
+<!-- (No deposit popups — the cashier handles bank selection + TrxID + submit inline) -->
 
 <div id="app" class="app-frame" style="display:none;">
 
@@ -2983,7 +3055,7 @@
     </section>
 
     <section id="view-deposit" class="view-section">
-        <!-- Step 1: Recharge -->
+        <!-- Step 1: Recharge (amount entry only) -->
         <div class="dep-step active" id="depStep1">
             <div class="paynow-page-header">
                 <button class="back-btn" onclick="switchView('home')"><i class="fa-solid fa-arrow-left"></i></button>
@@ -3012,140 +3084,95 @@
                     <input type="number" id="depAmount" data-i18n-ph="deposit.placeholder" placeholder="Please enter the recharge amount" min="1100">
                 </div>
 
-                <div class="pm-list-title" data-i18n="deposit.chooseMethod">Select payment method</div>
-                <div class="pm-list" id="depPmList">
-                    <!-- Populated dynamically by renderDepositMethods() -->
-                </div>
-
                 <button class="btn-recharge" id="depRechargeBtn" onclick="rechargeNow()" data-i18n="deposit.rechargeNow">Recharge Now</button>
-
-                <div class="recharge-info-list">
-                    <ol>
-                        <li data-i18n="deposit.info1">Minimum deposit 1100 BDT.</li>
-                        <li data-i18n="deposit.info2">To avoid any errors, we will provide relevant information before the transfer.</li>
-                        <li data-i18n="deposit.info3">After successful transfer, you will receive an SMS with a verification code so you can withdraw your funds as soon as possible.</li>
-                        <li data-i18n="deposit.info4">If you do not receive your funds for a long time, please contact our online customer service.</li>
-                        <li data-i18n="deposit.info5">We will take measures to ensure the security of your funds, protect them, and prevent unauthorized access.</li>
-                        <li data-i18n="deposit.info6">We will never ask for your account information or advertising materials!</li>
-                    </ol>
-                </div>
             </div>
         </div>
 
-        <!-- Step 2: Choose Bank -->
+        <!-- Step 2: Nayapay-style Cashier (Choose Bank + Copy Account + TrxID) -->
         <div class="dep-step" id="depStep2">
             <div class="paynow-page-header">
                 <button class="back-btn" onclick="goToDepositStep(1)"><i class="fa-solid fa-arrow-left"></i></button>
-                <h2 data-i18n="deposit.step2.title">Payment</h2>
+                <h2 data-i18n="deposit.cashierTitle">Cashier</h2>
                 <div style="width: 28px;"></div>
             </div>
 
             <div style="padding: 0 20px 20px;">
-                <div class="paynow-header-card">
-                    <div class="left">
-                        <div class="paynow-logo"><i class="fa-solid fa-p"></i></div>
-                        <div class="paynow-name" data-i18n="deposit.paynowBrand">Pay with PayNow<sup>®</sup></div>
+                <!-- Green header: Amount Payable + Order No. -->
+                <div class="nayapay-header">
+                    <div class="lft">
+                        <div class="lbl" data-i18n="deposit.np.amountLbl">Amount Payable / চকার পরিমাণ</div>
+                        <div class="amt">৳ <span id="depCashierAmountTop">0.00</span></div>
                     </div>
-                    <div class="lang-pill"><i class="fa-solid fa-globe"></i> EN <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: var(--text-soft);"></i></div>
-                </div>
-
-                <div class="paynow-amount-card">
-                    <div class="lbl" data-i18n="deposit.amount">Amount</div>
-                    <div class="val">
-                        <span class="num"><span id="depStep2Amount">0.00</span></span>
-                        <i class="fa-solid fa-eye eye"></i>
+                    <div class="rgt">
+                        <div class="lbl" data-i18n="deposit.np.orderLbl">Order No.</div>
+                        <div class="val" id="depCashierOrderSn">PN0000000000000</div>
                     </div>
-                    <div class="ordersn"><span data-i18n="deposit.orderNo">Order number:</span> <b id="depStep2OrderSn">PN0000000000000</b></div>
                 </div>
 
-                <div class="bank-list-title" data-i18n="deposit.selectedMethod">Selected payment method</div>
+                <!-- Instruction box (green border) -->
+                <ul class="nayapay-instructions">
+                    <li><b>"Send Money"</b> <span data-i18n="deposit.np.rule1">ব্যবহার করে গেটওয়ে কক্ষণ, অন্য কোনো পদ্ধতি ব্যবহার করা নিষিদ্ধ! অন্যথায় টাকা সমস্যাসৎ পৌঁছাবে না!</span></li>
+                    <li><span data-i18n="deposit.np.rule2Prefix">সেন্ড মানি কক্ষণে পরবর্তী</span> <b>"TrxID"</b> <span data-i18n="deposit.np.rule2Suffix">পুরণ করুন, অন্যথায় টাকা সমস্যাসৎ পৌঁছাবে না!</span></li>
+                </ul>
 
-                <div class="bank-card selected" id="depBankCard">
-                    <div class="bank-logo" id="depBankLogo"><i class="fa-solid fa-building-columns"></i></div>
-                    <div class="bank-info">
-                        <div class="bank-name" id="depBankName">—</div>
-                        <div class="bank-desc" id="depBankDesc" data-i18n="deposit.transferNext">Transfer to account details in the next step.</div>
+                <!-- Step 1: Choose Bank -->
+                <div class="nayapay-step">
+                    <div class="num">1</div>
+                    <div><span class="lbl" data-i18n="deposit.np.chooseBank">Choose Bank</span> <span class="bilingual" data-i18n="deposit.np.chooseBankBn">/ ব্যাঙ্ক নির্বাচন করুন</span></div>
+                </div>
+                <div class="nayapay-bank-row" id="depBankRow">
+                    <div class="nayapay-bank-card selected" data-method="bkash" onclick="selectNayapayBank('bkash', this)">
+                        <div class="nk-radio"></div>
+                        <div class="nk-logo bkash">bK</div>
+                        <div class="nk-name">bKash</div>
+                        <div class="nk-status" data-i18n="deposit.np.selected" style="display:none;" id="depBkashSelected">Selected</div>
                     </div>
-                    <div class="bank-radio"></div>
+                    <div class="nayapay-bank-card" data-method="nagad" onclick="selectNayapayBank('nagad', this)">
+                        <div class="nk-radio"></div>
+                        <div class="nk-logo nagad">NG</div>
+                        <div class="nk-name">Nagad</div>
+                        <div class="nk-status" data-i18n="deposit.np.selected" style="display:none;" id="depNagadSelected">Selected</div>
+                    </div>
                 </div>
 
-                <button class="btn-paynow" onclick="payNow()"><span data-i18n="deposit.payBtn">Pay</span> ৳ <span id="depStep2AmountBtn">0.00</span></button>
-            </div>
-        </div>
-
-        <!-- Step 3: PayNow Cashier -->
-        <div class="dep-step" id="depStep3">
-            <div class="paynow-page-header" style="flex-direction: column; align-items: stretch; gap: 4px;">
-                <div style="display: flex; align-items: center; justify-content: center; position: relative;">
-                    <button class="back-btn" onclick="goToDepositStep(2)" style="left: 0;"><i class="fa-solid fa-arrow-left"></i></button>
-                    <h2 style="flex: 1; text-align: center;" data-i18n="deposit.step3.title">PayNow<sup>®</sup> Cashier</h2>
-                    <div style="width: 40px;"></div>
+                <!-- Step 2: Copy Account Pay -->
+                <div class="nayapay-step">
+                    <div class="num">2</div>
+                    <div><span class="lbl" data-i18n="deposit.np.copyAccount">Copy Account Pay</span> <span class="bilingual" data-i18n="deposit.np.copyAccountBn">/ অ্যাকাউন্টে পে কপি করুন</span></div>
                 </div>
-                <div class="step-pills-row" style="padding: 8px 0 0; justify-content: center;">
-                    <div class="dep-step-pill done" id="depPill1"><i class="fa-solid fa-circle-check"></i> <span class="step-num">১.</span><span data-i18n="deposit.step1Pill">Deposit</span></div>
-                    <div class="dep-step-pill active" id="depPill2"><i class="fa-solid fa-circle-check"></i> <span class="step-num">২.</span><span data-i18n="deposit.step2Pill">Payment</span></div>
-                    <div class="dep-step-pill" id="depPill3"><i class="fa-solid fa-circle"></i> <span class="step-num">৩.</span><span data-i18n="deposit.step3Pill">Done</span></div>
-                </div>
-            </div>
-
-            <div style="padding: 0 20px 20px;">
-                <div class="paynow-cashier">
-                    <div class="paynow-cashier-head">
-                        <div class="left">
-                            <div class="paynow-logo"><i class="fa-solid fa-p"></i></div>
-                            <div class="paynow-name" data-i18n="deposit.paynowBrand">Pay with PayNow<sup>®</sup></div>
+                <div class="nayapay-copy-card">
+                    <div class="nayapay-copy-row">
+                        <div class="meta">
+                            <div class="lbl" data-i18n="deposit.np.paymentAmount">Payment Amount</div>
+                            <div class="val"><span id="depCopyAmount">0.00</span></div>
                         </div>
-                        <div class="lang-pill"><i class="fa-solid fa-globe"></i> EN <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: var(--text-soft);"></i></div>
+                        <button class="nayapay-copy-btn" onclick="copyText(document.getElementById('depCopyAmount').innerText)"><span data-i18n="deposit.np.copy">Copy</span></button>
                     </div>
-
-                    <div class="paynow-cashier-amount">
-                        <span class="num">৳ <span id="depStep3Amount">0.00</span></span>
-                        <button class="copy-btn" onclick="copyText(document.getElementById('depStep3Amount').innerText)"><i class="fa-solid fa-copy"></i></button>
+                    <div class="nayapay-copy-row">
+                        <div class="meta">
+                            <div class="lbl" data-i18n="deposit.np.targetAccount">Target Account</div>
+                            <div class="val acct" id="depCopyAccount">—</div>
+                        </div>
+                        <button class="nayapay-copy-btn" onclick="copyText(document.getElementById('depCopyAccount').innerText)"><span data-i18n="deposit.np.copy">Copy</span></button>
                     </div>
-
-                    <div class="paynow-expiry">
-                        <span data-i18n="deposit.expiry">Use this account only for this transaction. Account will expire in</span><br>
-                        <span data-i18n="deposit.expirySuffix">within</span> <b id="depCountdown">14:24</b>
-                    </div>
-
-                    <div class="paynow-detail-row">
-                        <span class="lbl" data-i18n="deposit.field.name">Name:</span>
-                        <span class="val"><span id="depCashierName">—</span></span>
-                    </div>
-                    <div class="paynow-detail-row">
-                        <span class="lbl" data-i18n="deposit.field.bank">Bank / Method:</span>
-                        <span class="val" id="depCashierBankName">—</span>
-                    </div>
-                    <div class="paynow-detail-row">
-                        <span class="lbl" data-i18n="deposit.field.account">Account:</span>
-                        <span class="val">
-                            <span id="depCashierAccount">—</span>
-                            <button class="copy-btn" onclick="copyText(document.getElementById('depCashierAccount').innerText)"><i class="fa-solid fa-copy"></i></button>
-                        </span>
-                    </div>
-                    <div class="paynow-detail-row">
-                        <span class="lbl" data-i18n="deposit.field.amount">Amount:</span>
-                        <span class="val">
-                            <span id="depCashierAmount">0.00</span>
-                            <button class="copy-btn" onclick="copyText(document.getElementById('depCashierAmount').innerText)"><i class="fa-solid fa-copy"></i></button>
-                        </span>
-                    </div>
-                    <div class="paynow-detail-row">
-                        <span class="lbl" data-i18n="deposit.field.orderCode">Order code:</span>
-                        <span class="val">
-                            <span id="depCashierOrderCode">—</span>
-                            <button class="copy-btn" onclick="copyText(document.getElementById('depCashierOrderCode').innerText)"><i class="fa-solid fa-copy"></i></button>
-                        </span>
+                    <div class="nayapay-copy-row">
+                        <div class="meta">
+                            <div class="lbl" data-i18n="deposit.np.bankType">Bank Type</div>
+                            <div class="val red" id="depCopyBankType">—</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="paynow-info-note">
-                    <i class="fa-solid fa-circle-info"></i>
-                    <span data-i18n="deposit.fillOrderCode">Fill in the order code in the reason/comment/description during transfer</span>
+                <!-- Step 3: Enter TrxID -->
+                <div class="nayapay-step">
+                    <div class="num">3</div>
+                    <div><span class="lbl" data-i18n="deposit.np.enterTrxid">Enter TrxID</span> <span class="bilingual" data-i18n="deposit.np.enterTrxidBn">/ TrxID প্রদান করুন</span></div>
                 </div>
-
-                <button class="btn-paynow-guide" onclick="showToast(window.t ? window.t('deposit.payGuideToast') : 'Please follow the instructions carefully and pay through your selected bank.')" data-i18n="deposit.payGuide">Payment Guide</button>
-                <button class="btn-paynow-done" onclick="openConfirmTxnSheet()" data-i18n="deposit.bankTransferDone">I have completed the bank transfer</button>
+                <input type="text" class="nayapay-trxid-input" id="depTrxId" data-i18n-ph="deposit.np.trxidPlaceholder" placeholder="Enter TrxID">
+                <div class="nayapay-helper" onclick="showToast(window.t ? window.t('sheet.toast.txn') : 'Open your banking app → Transfer history → Tap on the transfer to see the transaction ID.')">
+                    <span data-i18n="deposit.np.helperTrxid">কিভাবে TrxID পেতে হয় তা দেখতে ক্লিক করুন</span>
+                </div>
+                <button class="nayapay-submit" id="depNayapaySubmit" onclick="submitNayapayDeposit()" data-i18n="deposit.np.submit">Submit</button>
             </div>
         </div>
     </section>
@@ -3671,33 +3698,33 @@ let APP_SETTINGS = {
     telegramChannel: 'https://t.me/',
     telegramSupport: 'https://t.me/',
     depositAccounts: {
-        telebirr: { number: '01712345678', holder: 'ApexInvest Ltd', note: 'Fast processing within 5 mins.' },
-        cbe:      { number: '1000123456789', holder: 'ApexInvest LLC', note: 'Standard Bank Transfer' },
-        awash:    { number: '01320123456700', holder: 'ApexInvest LLC', note: 'Immediate CBE Transfer' },
-        boa:      { number: '98765432', holder: 'ApexInvest LLC', note: 'Local Bank Account' }
+        bkash: { number: '01700000000', holder: 'ApexInvest Ltd', note: 'Send Money from bKash and enter the TrxID.' },
+        nagad: { number: '01800000000', holder: 'ApexInvest Ltd', note: 'Send Money from Nagad and enter the TrxID.' }
     },
     // Payment methods added by the admin from the Admin Panel.
     // Each entry: { id, name, bankName, accountNumber, accountHolder, note, logoUrl, enabled, order }
+    // The defaults are bKash + Nagad so the cashier works out of the box for
+    // first-time admin login. The admin can edit / replace them anytime.
     paymentMethods: [
         {
-            id: 'pm_cbe',
-            name: 'CBE Birr',
-            bankName: 'Commercial Bank of Ethiopia',
-            accountNumber: '1000123456789',
-            accountHolder: 'ApexInvest LLC',
-            note: 'Use your CBE account to transfer. Reference order code in transfer reason.',
-            logoUrl: 'https://cdn-icons-png.flaticon.com/512/2830/2830284.png',
+            id: 'pm_bkash',
+            name: 'bKash',
+            bankName: 'bKash Send Money',
+            accountNumber: '01700000000',
+            accountHolder: 'ApexInvest Ltd',
+            note: 'Send Money from your bKash account and enter the TrxID below.',
+            logoUrl: 'https://cdn-icons-png.flaticon.com/512/2590/2590333.png',
             enabled: true,
             order: 1
         },
         {
-            id: 'pm_telebirr',
-            name: 'Telebirr',
-            bankName: 'Telebirr Mobile Wallet',
-            accountNumber: '01712345678',
+            id: 'pm_nagad',
+            name: 'Nagad',
+            bankName: 'Nagad Send Money',
+            accountNumber: '01800000000',
             accountHolder: 'ApexInvest Ltd',
-            note: 'Fast processing within 5 minutes.',
-            logoUrl: 'https://cdn-icons-png.flaticon.com/512/2590/2590333.png',
+            note: 'Send Money from your Nagad account and enter the TrxID below.',
+            logoUrl: 'https://cdn-icons-png.flaticon.com/512/888/888154.png',
             enabled: true,
             order: 2
         }
@@ -3791,8 +3818,6 @@ function initApp() {
             document.getElementById('lvl1PctDisplay').innerText = APP_SETTINGS.referralLevel1;
             document.getElementById('lvl2PctDisplay').innerText = APP_SETTINGS.referralLevel2;
             document.getElementById('lvl3PctDisplay').innerText = APP_SETTINGS.referralLevel3;
-            // Re-render deposit method list whenever settings change
-            renderDepositMethods();
             // Refresh Telegram customer-service links on the support view
             if (typeof refreshSupportLinks === 'function') refreshSupportLinks();
         });
@@ -4400,6 +4425,9 @@ function renderMyInvestments() {
 }
 
 // ==== DEPOSIT LOGIC ====
+// depositState holds the in-flight recharge details. bkashMethod / nagadMethod
+// are the admin-configured payment methods (with logoUrl + accountNumber) that
+// the Nayapay-style cashier renders on step 2.
 let depositState = {
     amount: 0,
     methodId: '',
@@ -4413,7 +4441,9 @@ let depositState = {
     orderCode: '',
     countdownInterval: null,
     confirmTab: 'txn',
-    expiryTs: 0
+    expiryTs: 0,
+    bkashMethod: null,
+    nagadMethod: null
 };
 
 // ==== DUPLICATE TRANSACTION ID PROTECTION ====
@@ -4478,84 +4508,14 @@ function selectQuickAmount(amt) {
 }
 
 // ==== DYNAMIC PAYMENT METHODS (managed by admin) ====
+// Returns the enabled methods sorted by admin-defined order. Used by the
+// cashier to find the bKash / Nagad entries and render their account
+// numbers / logos without any other page or popup.
 function getActivePaymentMethods() {
     const list = (APP_SETTINGS && APP_SETTINGS.paymentMethods) ? APP_SETTINGS.paymentMethods : [];
     return list
         .filter(m => m && m.enabled !== false)
         .sort((a, b) => (a.order || 0) - (b.order || 0));
-}
-
-function getPaymentMethodById(id) {
-    const list = (APP_SETTINGS && APP_SETTINGS.paymentMethods) ? APP_SETTINGS.paymentMethods : [];
-    return list.find(m => m && m.id === id) || null;
-}
-
-function renderDepositMethods() {
-    const listEl = document.getElementById('depPmList');
-    if (!listEl) return;
-    const methods = getActivePaymentMethods();
-    // Localized helper for the dynamic deposit-method copy.
-    const tKey = (k, fallback) => (window.t && typeof window.t === 'function')
-        ? window.t(k)
-        : fallback;
-    if (methods.length === 0) {
-        listEl.innerHTML = `
-        <div class="pm-card-empty">
-            <i class="fa-solid fa-circle-info"></i>
-            <span data-i18n="deposit.toast.noMethods">No payment methods are available right now.</span><br>
-            <span data-i18n="deposit.toast.noMethodsSub">Please contact the admin or try again later.</span>
-        </div>`;
-        // Make sure the freshly inserted spans follow the current language.
-        if (typeof applyLanguage === 'function') {
-            try { applyLanguage(typeof getLang === 'function' ? getLang() : 'en'); } catch (e) { /* ignore */ }
-        }
-        return;
-    }
-    // Ensure a valid selection (prefer current, otherwise first)
-    const current = depositState.methodId && methods.find(m => m.id === depositState.methodId);
-    if (!current) {
-        const m = methods[0];
-        depositState.methodId = m.id;
-        depositState.methodName = m.name;
-        depositState.methodBank = m.bankName || m.name;
-        depositState.methodLogo = m.logoUrl || '';
-        depositState.methodAccount = m.accountNumber || '';
-        depositState.methodHolder = m.accountHolder || '';
-        depositState.methodNote = m.note || '';
-    }
-    // Localized "A/C" prefix for the meta line under each method.
-    const acPrefix = tKey('deposit.acPrefix', 'A/C');
-    listEl.innerHTML = methods.map(m => {
-        const selected = (m.id === depositState.methodId) ? ' selected' : '';
-        const logoHtml = m.logoUrl
-            ? `<img src="${escapeHtml(m.logoUrl)}" alt="${escapeHtml(m.name)}" onerror="this.style.display='none';this.parentNode.innerHTML='<i class=\\'fa-solid fa-building-columns\\'></i>';">`
-            : `<i class="fa-solid fa-building-columns"></i>`;
-        const meta = m.bankName && m.bankName.toLowerCase() !== m.name.toLowerCase()
-            ? `${escapeHtml(m.bankName)} · ${acPrefix} ${escapeHtml(m.accountNumber || '—')}`
-            : `${acPrefix} ${escapeHtml(m.accountNumber || '—')}`;
-        return `
-        <div class="pm-card${selected}" data-pm-id="${escapeHtml(m.id)}" onclick="selectDepositMethod('${escapeHtml(m.id)}')">
-            <div class="pm-logo">${logoHtml}</div>
-            <div class="pm-info">
-                <div class="pm-name">${escapeHtml(m.name)}</div>
-                <div class="pm-meta">${meta}</div>
-            </div>
-            <div class="pm-radio"></div>
-        </div>`;
-    }).join('');
-}
-
-function selectDepositMethod(id) {
-    const m = getPaymentMethodById(id);
-    if (!m) return;
-    depositState.methodId = m.id;
-    depositState.methodName = m.name;
-    depositState.methodBank = m.bankName || m.name;
-    depositState.methodLogo = m.logoUrl || '';
-    depositState.methodAccount = m.accountNumber || '';
-    depositState.methodHolder = m.accountHolder || '';
-    depositState.methodNote = m.note || '';
-    renderDepositMethods();
 }
 
 function escapeHtml(str) {
@@ -4579,217 +4539,172 @@ function rechargeNow() {
             .replace('{min}', String(APP_SETTINGS.minDeposit)));
         return;
     }
-    const methods = getActivePaymentMethods();
-    if (methods.length === 0 || !depositState.methodId) {
-        showToast(tKey('deposit.toast.chooseMethodFirst', 'Please select a payment method first.'));
-        return;
-    }
-    // Re-validate the currently selected method (in case admin disabled it between renders)
-    const sel = methods.find(m => m.id === depositState.methodId);
-    if (!sel) {
-        showToast(tKey('deposit.toast.methodUnavailable', 'The selected payment method is no longer available.'));
-        renderDepositMethods();
-        return;
-    }
+    // No more popups — go straight to the cashier. The cashier itself
+    // lets the user choose between bKash and Nagad (configured by the admin
+    // under settings/paymentMethods). If admin hasn't set up a bKash or
+    // Nagad account, the cashier falls back to a safe default placeholder.
     depositState.amount = amount;
-    depositState.methodName = sel.name;
-    depositState.methodBank = sel.bankName || sel.name;
-    depositState.methodLogo = sel.logoUrl || '';
-    depositState.methodAccount = sel.accountNumber || '';
-    depositState.methodHolder = sel.accountHolder || '';
-    depositState.methodNote = sel.note || '';
     depositState.orderSn = generateOrderSn();
     depositState.orderCode = generateOrderCode();
-    document.getElementById('bankNoticeModal').style.display = 'flex';
-}
-
-function closeBankNotice() {
-    document.getElementById('bankNoticeModal').style.display = 'none';
+    // Auto-detect which bank to preselect based on what the admin has set up.
+    const methods = (APP_SETTINGS && Array.isArray(APP_SETTINGS.paymentMethods))
+        ? APP_SETTINGS.paymentMethods.filter(m => m && m.enabled !== false)
+        : [];
+    const bkash = methods.find(m => /bkash/i.test(m.name || '') || /bkash/i.test(m.id || ''));
+    const nagad = methods.find(m => /nagad/i.test(m.name || '') || /nagad/i.test(m.id || ''));
+    depositState.bkashMethod = bkash || null;
+    depositState.nagadMethod = nagad || null;
     goToDepositStep(2);
-}
-
-function payNow() {
-    document.getElementById('importantNoticeModal').style.display = 'flex';
-    const btn = document.getElementById('readCarefullyBtn');
-    const counter = document.getElementById('readCountdown');
-    btn.classList.remove('ready');
-    btn.disabled = true;
-    let n = 1;
-    counter.innerText = n;
-    if (window._impNoticeInterval) clearInterval(window._impNoticeInterval);
-    window._impNoticeInterval = setInterval(() => {
-        n--;
-        if (n <= 0) {
-            clearInterval(window._impNoticeInterval);
-            window._impNoticeInterval = null;
-            btn.classList.add('ready');
-            btn.disabled = false;
-            btn.innerHTML = (window.t && typeof window.t === 'function')
-                ? window.t('deposit.impNotice.readUnderstood')
-                : 'I have read and understood';
-        } else {
-            counter.innerText = n;
-        }
-    }, 1000);
-}
-
-function acceptImportantNotice() {
-    document.getElementById('importantNoticeModal').style.display = 'none';
-    goToDepositStep(3);
-    startCashierCountdown();
-}
-
-function startCashierCountdown() {
-    if (depositState.countdownInterval) clearInterval(depositState.countdownInterval);
-    depositState.expiryTs = Date.now() + 15 * 60 * 1000; // 15 min
-    const el = document.getElementById('depCountdown');
-    function tick() {
-        const remain = Math.max(0, depositState.expiryTs - Date.now());
-        const m = Math.floor(remain / 60000);
-        const s = Math.floor((remain % 60000) / 1000);
-        el.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        if (remain <= 0) {
-            clearInterval(depositState.countdownInterval);
-            el.innerText = '00:00';
-        }
-    }
-    tick();
-    depositState.countdownInterval = setInterval(tick, 1000);
 }
 
 function goToDepositStep(step) {
     document.querySelectorAll('#view-deposit .dep-step').forEach(el => el.classList.remove('active'));
     document.getElementById('depStep' + step).classList.add('active');
 
-    // Localized helper for the dynamic step-2 / step-3 copy.
+    // Localized helper for the dynamic step copy.
     const tKey = (k, fallback) => (window.t && typeof window.t === 'function')
         ? window.t(k)
         : fallback;
-    const lang = (typeof getLang === 'function') ? getLang() : 'en';
 
     if (step === 2) {
+        // Nayapay-style cashier: top header with amount + order, then 3 sections
+        // (choose bank, copy account, enter TrxID). The account number / logo
+        // / holder for each bank come from the admin's payment-method config
+        // (bkashMethod / nagadMethod on depositState, populated by rechargeNow).
         const amt = depositState.amount || 0;
-        document.getElementById('depStep2Amount').innerText = amt.toFixed(2);
-        document.getElementById('depStep2AmountBtn').innerText = amt.toFixed(2);
-        document.getElementById('depStep2OrderSn').innerText = depositState.orderSn;
-        // Update the Step 2 card to reflect the chosen method
-        const nameEl = document.getElementById('depBankName');
-        const descEl = document.getElementById('depBankDesc');
-        const logoEl = document.getElementById('depBankLogo');
-        if (nameEl) {
-            const fallbackName = lang === 'bn' ? 'নির্বাচিত পদ্ধতি' : 'Selected method';
-            nameEl.innerText = depositState.methodName || tKey('deposit.methodFallback', fallbackName);
-        }
-        if (descEl) {
-            // Two-line format: bank name + "transfer to" line, then account.
-            if (depositState.methodBank) {
-                const tpl = tKey('deposit.transferToBank', 'Transfer to {bank} · Account {acc}');
-                descEl.innerText = tpl
-                    .replace('{bank}', depositState.methodBank)
-                    .replace('{acc}', depositState.methodAccount || '—');
-            } else {
-                descEl.innerText = tKey('deposit.transferNext', 'Transfer to account details in the next step.');
-            }
-        }
-        if (logoEl) {
-            if (depositState.methodLogo) {
-                logoEl.innerHTML = `<img src="${escapeHtml(depositState.methodLogo)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" onerror="this.outerHTML='<i class=\\'fa-solid fa-building-columns\\'></i>';">`;
-            } else {
-                logoEl.innerHTML = '<i class="fa-solid fa-building-columns"></i>';
-            }
-        }
-    } else if (step === 3) {
-        const amt = depositState.amount || 0;
-        document.getElementById('depStep3Amount').innerText = amt.toFixed(2);
-        document.getElementById('depCashierAmount').innerText = amt.toFixed(2);
-        document.getElementById('depCashierName').innerText = depositState.methodHolder || 'ApexInvest LLC';
-        document.getElementById('depCashierAccount').innerText = depositState.methodAccount || '1000123456789';
-        document.getElementById('depCashierOrderCode').innerText = depositState.orderCode;
-        const bankEl = document.getElementById('depCashierBankName');
-        if (bankEl) bankEl.innerText = depositState.methodName + (depositState.methodBank && depositState.methodBank !== depositState.methodName ? ' · ' + depositState.methodBank : '');
+        const amtTop = document.getElementById('depCashierAmountTop');
+        const orderSnEl = document.getElementById('depCashierOrderSn');
+        const copyAmt = document.getElementById('depCopyAmount');
+        if (amtTop) amtTop.innerText = amt.toFixed(2);
+        if (copyAmt) copyAmt.innerText = amt.toFixed(2);
+        if (orderSnEl) orderSnEl.innerText = depositState.orderSn || '';
 
-        document.getElementById('depPill1').className = 'dep-step-pill done';
-        document.getElementById('depPill2').className = 'dep-step-pill active';
-        document.getElementById('depPill3').className = 'dep-step-pill';
-        document.getElementById('depPill1').innerHTML = '<i class="fa-solid fa-circle-check"></i> <span class="step-num">১.</span>জমা দিন';
-        document.getElementById('depPill2').innerHTML = '<i class="fa-solid fa-circle-check"></i> <span class="step-num">২.</span>পেমেন্ট';
-        document.getElementById('depPill3').innerHTML = '<i class="fa-solid fa-circle"></i> <span class="step-num">৩.</span>সম্পন্ন';
+        // Default the cashier to whichever bank the admin has actually set up;
+        // fall back to bKash if both are missing.
+        const hasBkash = !!(depositState.bkashMethod && depositState.bkashMethod.accountNumber);
+        const hasNagad = !!(depositState.nagadMethod && depositState.nagadMethod.accountNumber);
+        const defaultBank = hasNagad ? 'nagad' : (hasBkash ? 'bkash' : 'bkash');
+
+        // Sync the card logos with the admin-supplied logoUrls (or fallback
+        // initials) so the cashier reflects what the admin configured.
+        ['bkash', 'nagad'].forEach(b => {
+            const pm = (b === 'nagad') ? depositState.nagadMethod : depositState.bkashMethod;
+            const card = document.querySelector(`#depBankRow .nayapay-bank-card[data-method="${b}"]`);
+            if (!card) return;
+            const logoEl = card.querySelector('.nk-logo');
+            if (logoEl) {
+                if (pm && pm.logoUrl) {
+                    logoEl.innerHTML = `<img src="${escapeHtml(pm.logoUrl)}" alt="${escapeHtml(pm.name || b)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.outerHTML='${b === 'nagad' ? 'NG' : 'bK'}';">`;
+                } else {
+                    logoEl.innerHTML = (b === 'nagad') ? 'NG' : 'bK';
+                }
+            }
+            card.classList.toggle('selected', b === defaultBank);
+            const statusEl = b === 'bkash' ? document.getElementById('depBkashSelected') : document.getElementById('depNagadSelected');
+            if (statusEl) statusEl.style.display = (b === defaultBank) ? 'block' : 'none';
+        });
+
+        // Clear the TrxID field for a fresh attempt.
+        const trxEl = document.getElementById('depTrxId');
+        if (trxEl) trxEl.value = '';
+
+        // Trigger the right card's selection handler so the account / type
+        // / state all sync to the right admin-configured method.
+        if (typeof selectNayapayBank === 'function') {
+            selectNayapayBank(defaultBank, null);
+        }
     } else if (step === 1) {
         if (depositState.countdownInterval) {
             clearInterval(depositState.countdownInterval);
             depositState.countdownInterval = null;
         }
-        renderDepositMethods();
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function openConfirmTxnSheet() {
-    depositState.confirmTab = 'txn';
-    document.getElementById('sheetOverlay').classList.add('show');
-    document.getElementById('confirmTxnSheet').classList.add('show');
-    switchConfirmTab('txn', document.querySelector('.sheet-tab[data-tab="txn"]'));
+// ===== Nayapay-style cashier interactions =====
+// Click handler for the bKash / Nagad selection cards on the cashier page.
+function selectNayapayBank(method, el) {
+    const m = (method || '').toLowerCase();
+    document.querySelectorAll('#depBankRow .nayapay-bank-card').forEach(c => {
+        const cm = (c.getAttribute('data-method') || '').toLowerCase();
+        c.classList.toggle('selected', cm === m);
+        const statusEl = cm === 'bkash' ? document.getElementById('depBkashSelected') : document.getElementById('depNagadSelected');
+        if (statusEl) statusEl.style.display = (cm === m) ? 'block' : 'none';
+    });
+
+    // Pull the account number + logo + holder from the admin's payment-method
+    // config (the admin enters these from the admin panel). Fall back to
+    // placeholders if admin hasn't set them up yet.
+    const pm = (m === 'nagad') ? depositState.nagadMethod : depositState.bkashMethod;
+    const methodName = (m === 'nagad') ? 'Nagad' : 'bKash';
+    const bankType   = (m === 'nagad') ? 'Nagad Send Money' : 'bKash Send Money';
+    const accountNumber = (pm && pm.accountNumber) ? pm.accountNumber : '—';
+    const logoUrl = (pm && pm.logoUrl) ? pm.logoUrl : '';
+
+    const copyAcc = document.getElementById('depCopyAccount');
+    const copyType = document.getElementById('depCopyBankType');
+    if (copyAcc) copyAcc.innerText = accountNumber;
+    if (copyType) copyType.innerText = bankType;
+
+    // Update the bank card's logo to the admin-provided image (if any).
+    const card = document.querySelector(`#depBankRow .nayapay-bank-card[data-method="${m}"] .nk-logo`);
+    if (card) {
+        if (logoUrl) {
+            card.innerHTML = `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(methodName)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.outerHTML='${m === 'nagad' ? 'NG' : 'bK'}';">`;
+        } else {
+            card.innerHTML = (m === 'nagad') ? 'NG' : 'bK';
+        }
+    }
+
+    // Sync the deposit state with the picked method so submitDeposit records
+    // the right method name / account / holder.
+    depositState.methodName = methodName;
+    depositState.methodBank = bankType;
+    depositState.methodAccount = accountNumber;
+    depositState.methodLogo  = logoUrl;
+    depositState.methodId     = (pm && pm.id) || ('pm_' + m);
+    depositState.methodHolder = (pm && pm.accountHolder) || 'ApexInvest';
+    depositState.methodNote   = (pm && pm.note) || '';
 }
 
-function closeConfirmTxnSheet() {
-    document.getElementById('sheetOverlay').classList.remove('show');
-    document.getElementById('confirmTxnSheet').classList.remove('show');
-}
-
-function switchConfirmTab(tab, btn) {
-    depositState.confirmTab = tab;
-    document.querySelectorAll('.sheet-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.sheet-tab-pane').forEach(p => p.style.display = 'none');
-    const paneId = tab === 'txn' ? 'sheetPaneTxn' : tab === 'sender' ? 'sheetPaneSender' : 'sheetPaneSms';
-    document.getElementById(paneId).style.display = 'block';
-    const submitBtn = document.getElementById('sheetSubmitBtn');
-    // Localized submit button label per tab — keeps the active language in sync.
-    const submitKey = tab === 'txn' ? 'sheet.tab.txn' : tab === 'sender' ? 'sheet.tab.sender' : 'sheet.tab.sms';
-    submitBtn.innerText = (window.t && typeof window.t === 'function')
-        ? window.t(submitKey)
-        : (tab === 'txn' ? 'Submit Transaction ID' : tab === 'sender' ? 'Submit Sender Name' : 'Submit SMS Screenshot');
-}
-
-function submitConfirmTxn() {
-    let ref = '';
-    const tab = depositState.confirmTab;
-    // Localized helper — falls back to the hardcoded strings if window.t is
-    // not available yet (very first load).
+// Submit handler for the Nayapay cashier. Reads the TrxID straight from the
+// inline input, validates it, then runs the same submit pipeline as the
+// legacy bottom sheet (with confirmTab = 'txn') so duplicate-TrxID checks,
+// the transaction record, and the success modal all behave the same.
+function submitNayapayDeposit() {
     const tKey = (k, fallback) => (window.t && typeof window.t === 'function')
         ? window.t(k)
         : fallback;
-    if (tab === 'txn') {
-        ref = document.getElementById('sheetTxnInput').value.trim();
-        if (!ref) { showToast(tKey('sheet.toast.enterTxn', 'Please enter your transaction ID.')); return; }
-        if (ref.length < 4) { showToast(tKey('sheet.toast.txnShort', 'Transaction ID looks too short.')); return; }
-        // Pre-check duplicate transaction ID — fast UX feedback.
-        const submitBtn = document.getElementById('sheetSubmitBtn');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.innerText = tKey('sheet.toast.checking', 'Checking…');
-        }
-        checkRefAlreadyUsed(ref).then((res) => {
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerText = tKey('sheet.tab.txn', 'Submit Transaction ID');
-            }
-            if (res && res.taken) {
-                showToast(tKey('sheet.toast.txnUsed', 'This transaction ID has already been used.'));
-                return;
-            }
-            submitDeposit(ref);
-        });
+    const trxEl = document.getElementById('depTrxId');
+    const ref = trxEl ? trxEl.value.trim() : '';
+    if (!ref) {
+        showToast(tKey('sheet.toast.enterTxn', 'Please enter your transaction ID.'));
+        if (trxEl) trxEl.focus();
         return;
-    } else if (tab === 'sender') {
-        ref = document.getElementById('sheetSenderInput').value.trim();
-        if (!ref) { showToast(tKey('sheet.toast.enterSender', 'Please enter the sender name.')); return; }
-    } else {
-        const f = document.getElementById('sheetSmsInput');
-        if (!f.files || f.files.length === 0) { showToast(tKey('sheet.toast.attachSms', 'Please attach an SMS screenshot.')); return; }
-        ref = tKey('sheet.smsPrefix', '[SMS image] ') + f.files[0].name;
     }
-    submitDeposit(ref);
+    if (ref.length < 4) {
+        showToast(tKey('sheet.toast.txnShort', 'Transaction ID looks too short.'));
+        return;
+    }
+    // Make sure the existing submit pipeline runs in TrxID-tab mode.
+    depositState.confirmTab = 'txn';
+    const submitBtn = document.getElementById('depNayapaySubmit');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = tKey('sheet.toast.checking', 'Checking…');
+    }
+    checkRefAlreadyUsed(ref).then((res) => {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = tKey('deposit.np.submit', 'Submit');
+        }
+        if (res && res.taken) {
+            showToast(tKey('sheet.toast.txnUsed', 'This transaction ID has already been used.'));
+            return;
+        }
+        submitDeposit(ref);
+    });
 }
 
 function submitDeposit(ref) {
@@ -4831,7 +4746,6 @@ function submitDeposit(ref) {
     const refKey = isTxnFlow ? encodeRefKey(ref) : '';
 
     const onSuccess = () => {
-        closeConfirmTxnSheet();
         const successTitle = tKey('deposit.toast.submittedTitle', 'Deposit request submitted!');
         const successBody  = tKey('deposit.toast.submittedBody',
             'Your transaction is being verified. Once approved, the amount will be added to your balance.');
@@ -4840,12 +4754,12 @@ function submitDeposit(ref) {
         depositState = {
             amount: 0, methodId: '', methodName: '', methodBank: '',
             methodLogo: '', methodAccount: '', methodHolder: '', methodNote: '',
-            orderSn: '', orderCode: '', countdownInterval: null, confirmTab: 'txn', expiryTs: 0
+            orderSn: '', orderCode: '', countdownInterval: null, confirmTab: 'txn', expiryTs: 0,
+            bkashMethod: null, nagadMethod: null
         };
         document.getElementById('depAmount').value = '';
-        document.getElementById('sheetTxnInput').value = '';
-        document.getElementById('sheetSenderInput').value = '';
-        if (document.getElementById('sheetSmsInput')) document.getElementById('sheetSmsInput').value = '';
+        const trxEl = document.getElementById('depTrxId');
+        if (trxEl) trxEl.value = '';
         document.querySelectorAll('#depQuickAmounts .amt-btn').forEach(b => {
             b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
         });
@@ -6246,9 +6160,8 @@ function switchView(viewId) {
     if (nav) nav.classList.add('active');
 
     if (viewId === 'deposit') {
-        // Reset to step 1 and re-render payment methods list
+        // Reset to step 1 (just the amount-entry screen).
         goToDepositStep(1);
-        renderDepositMethods();
     }
 
     if (viewId === 'support') {
@@ -7167,7 +7080,7 @@ function renderAdminPaymentMethods() {
         <div class="plan-form-grid">
             <div class="input-group">
                 <label>Method Name *</label>
-                <input type="text" id="newPmName" placeholder="e.g. CBE Birr, Telebirr, Awash Bank">
+                <input type="text" id="newPmName" placeholder="e.g. bKash, Nagad">
             </div>
             <div class="input-group">
                 <label>Bank / Provider Name</label>
@@ -8489,6 +8402,26 @@ adminCreateGiftCode = function() {
             'deposit.payGuide':        'Payment Guide',
             'deposit.payGuideToast':   'Please follow the instructions carefully and pay through your selected bank.',
             'deposit.bankTransferDone':'I have completed the bank transfer',
+            'deposit.cashierTitle':  'Cashier',
+            'deposit.np.amountLbl':  'Amount Payable / চকার পরিমাণ',
+            'deposit.np.orderLbl':   'Order No.',
+            'deposit.np.rule1':      'must be used for the gateway; no other method is allowed! Otherwise the money will not reach the destination!',
+            'deposit.np.rule2Prefix':'In the Send Money section, fill in the next',
+            'deposit.np.rule2Suffix':'; otherwise the money will not reach the destination!',
+            'deposit.np.chooseBank':  'Choose Bank',
+            'deposit.np.chooseBankBn':'/ ব্যাঙ্ক নির্বাচন করুন',
+            'deposit.np.selected':    'Selected',
+            'deposit.np.copyAccount': 'Copy Account Pay',
+            'deposit.np.copyAccountBn':'/ অ্যাকাউন্টে পে কপি করুন',
+            'deposit.np.paymentAmount':'Payment Amount',
+            'deposit.np.targetAccount':'Target Account',
+            'deposit.np.bankType':    'Bank Type',
+            'deposit.np.copy':        'Copy',
+            'deposit.np.enterTrxid':  'Enter TrxID',
+            'deposit.np.enterTrxidBn':'/ TrxID প্রদান করুন',
+            'deposit.np.trxidPlaceholder':'Enter TrxID',
+            'deposit.np.helperTrxid': 'Click to see how to get TrxID',
+            'deposit.np.submit':      'Submit',
 
             // --- Bank notice modal ---
             'deposit.bankNotice.title':   'Bank Selection Notice',
@@ -8876,6 +8809,26 @@ adminCreateGiftCode = function() {
             'deposit.payGuide':        'পেমেন্ট গাইড',
             'deposit.payGuideToast':   'অনুগ্রহ করে নির্দেশাবলী সাবধানে অনুসরণ করুন এবং আপনার নির্বাচিত ব্যাঙ্কের মাধ্যমে পেমেন্ট করুন।',
             'deposit.bankTransferDone':'আমি ব্যাঙ্ক ট্রান্সফার সম্পন্ন করেছি',
+            'deposit.cashierTitle':  'ক্যাশিয়ার',
+            'deposit.np.amountLbl':  'চকার পরিমাণ',
+            'deposit.np.orderLbl':   'অর্ডার নং',
+            'deposit.np.rule1':      'ব্যবহার করে গেটওয়ে কক্ষণ, অন্য কোনো পদ্ধতি ব্যবহার করা নিষিদ্ধ! অন্যথায় টাকা সমস্যাসৎ পৌঁছাবে না!',
+            'deposit.np.rule2Prefix':'সেন্ড মানি কক্ষণে পরবর্তী',
+            'deposit.np.rule2Suffix':'পুরণ করুন, অন্যথায় টাকা সমস্যাসৎ পৌঁছাবে না!',
+            'deposit.np.chooseBank':  'ব্যাঙ্ক নির্বাচন',
+            'deposit.np.chooseBankBn':'',
+            'deposit.np.selected':    'নির্বাচিত',
+            'deposit.np.copyAccount': 'অ্যাকাউন্টে পে কপি',
+            'deposit.np.copyAccountBn':'',
+            'deposit.np.paymentAmount':'পরিমাণ',
+            'deposit.np.targetAccount':'টার্গেট অ্যাকাউন্ট',
+            'deposit.np.bankType':    'ব্যাঙ্ক ধরন',
+            'deposit.np.copy':        'কপি',
+            'deposit.np.enterTrxid':  'TrxID প্রদান',
+            'deposit.np.enterTrxidBn':'',
+            'deposit.np.trxidPlaceholder':'TrxID লিখুন',
+            'deposit.np.helperTrxid': 'কিভাবে TrxID পেতে হয় তা দেখতে ক্লিক করুন',
+            'deposit.np.submit':      'জমা দিন',
 
             // --- Bank notice modal ---
             'deposit.bankNotice.title':   'ব্যাঙ্ক নির্বাচন সতর্কতা',
