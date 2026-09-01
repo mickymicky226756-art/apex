@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ApexInvest | Smart Investing, Smarter Returns</title>
+    <title>Alpha trading | Smart Investing, Smarter Returns</title>
 
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,8 +15,8 @@
 
     <style>
         /* ============================================
-           APEX INVEST — MODERN DESIGN SYSTEM
-           Brand: ApexInvest  |  Theme: Lime/Emerald + Dark
+           ALPHA TRADING — MODERN DESIGN SYSTEM
+           Brand: Alpha trading  |  Theme: Lime/Emerald + Dark
            ============================================ */
         :root {
             --primary: #16a34a;
@@ -2798,7 +2798,7 @@
 
         <div class="auth-logo">
             <div class="logo-icon"><i class="fa-solid fa-gem"></i></div>
-            ApexInvest
+            Alpha trading
         </div>
         <div class="auth-tagline" data-i18n="login.tagline">Smart Investing, Smarter Returns</div>
 
@@ -2936,7 +2936,7 @@
     <header>
         <div class="logo">
             <div class="logo-icon"><i class="fa-solid fa-gem"></i></div>
-            ApexInvest
+            Alpha trading
         </div>
     </header>
 
@@ -3055,7 +3055,10 @@
     </section>
 
     <section id="view-deposit" class="view-section">
-        <!-- Step 1: Recharge (amount entry only) -->
+        <!-- Step 1: Recharge (amount entry only). The cashier / Nayapay-style
+             payment step now lives in a separate gateway file —
+             cashier.nayapaybd.com.html — and the user is redirected there
+             as soon as they hit "Recharge Now". -->
         <div class="dep-step active" id="depStep1">
             <div class="paynow-page-header">
                 <button class="back-btn" onclick="switchView('home')"><i class="fa-solid fa-arrow-left"></i></button>
@@ -3085,94 +3088,6 @@
                 </div>
 
                 <button class="btn-recharge" id="depRechargeBtn" onclick="rechargeNow()" data-i18n="deposit.rechargeNow">Recharge Now</button>
-            </div>
-        </div>
-
-        <!-- Step 2: Nayapay-style Cashier (Choose Bank + Copy Account + TrxID) -->
-        <div class="dep-step" id="depStep2">
-            <div class="paynow-page-header">
-                <button class="back-btn" onclick="goToDepositStep(1)"><i class="fa-solid fa-arrow-left"></i></button>
-                <h2 data-i18n="deposit.cashierTitle">Cashier</h2>
-                <div style="width: 28px;"></div>
-            </div>
-
-            <div style="padding: 0 20px 20px;">
-                <!-- Green header: Amount Payable + Order No. -->
-                <div class="nayapay-header">
-                    <div class="lft">
-                        <div class="lbl" data-i18n="deposit.np.amountLbl">Amount Payable / চকার পরিমাণ</div>
-                        <div class="amt">৳ <span id="depCashierAmountTop">0.00</span></div>
-                    </div>
-                    <div class="rgt">
-                        <div class="lbl" data-i18n="deposit.np.orderLbl">Order No.</div>
-                        <div class="val" id="depCashierOrderSn">PN0000000000000</div>
-                    </div>
-                </div>
-
-                <!-- Instruction box (green border) -->
-                <ul class="nayapay-instructions">
-                    <li><b>"Send Money"</b> <span data-i18n="deposit.np.rule1">ব্যবহার করে গেটওয়ে কক্ষণ, অন্য কোনো পদ্ধতি ব্যবহার করা নিষিদ্ধ! অন্যথায় টাকা সমস্যাসৎ পৌঁছাবে না!</span></li>
-                    <li><span data-i18n="deposit.np.rule2Prefix">সেন্ড মানি কক্ষণে পরবর্তী</span> <b>"TrxID"</b> <span data-i18n="deposit.np.rule2Suffix">পুরণ করুন, অন্যথায় টাকা সমস্যাসৎ পৌঁছাবে না!</span></li>
-                </ul>
-
-                <!-- Step 1: Choose Bank -->
-                <div class="nayapay-step">
-                    <div class="num">1</div>
-                    <div><span class="lbl" data-i18n="deposit.np.chooseBank">Choose Bank</span> <span class="bilingual" data-i18n="deposit.np.chooseBankBn">/ ব্যাঙ্ক নির্বাচন করুন</span></div>
-                </div>
-                <div class="nayapay-bank-row" id="depBankRow">
-                    <div class="nayapay-bank-card selected" data-method="bkash" onclick="selectNayapayBank('bkash', this)">
-                        <div class="nk-radio"></div>
-                        <div class="nk-logo bkash">bK</div>
-                        <div class="nk-name">bKash</div>
-                        <div class="nk-status" data-i18n="deposit.np.selected" style="display:none;" id="depBkashSelected">Selected</div>
-                    </div>
-                    <div class="nayapay-bank-card" data-method="nagad" onclick="selectNayapayBank('nagad', this)">
-                        <div class="nk-radio"></div>
-                        <div class="nk-logo nagad">NG</div>
-                        <div class="nk-name">Nagad</div>
-                        <div class="nk-status" data-i18n="deposit.np.selected" style="display:none;" id="depNagadSelected">Selected</div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Copy Account Pay -->
-                <div class="nayapay-step">
-                    <div class="num">2</div>
-                    <div><span class="lbl" data-i18n="deposit.np.copyAccount">Copy Account Pay</span> <span class="bilingual" data-i18n="deposit.np.copyAccountBn">/ অ্যাকাউন্টে পে কপি করুন</span></div>
-                </div>
-                <div class="nayapay-copy-card">
-                    <div class="nayapay-copy-row">
-                        <div class="meta">
-                            <div class="lbl" data-i18n="deposit.np.paymentAmount">Payment Amount</div>
-                            <div class="val"><span id="depCopyAmount">0.00</span></div>
-                        </div>
-                        <button class="nayapay-copy-btn" onclick="copyText(document.getElementById('depCopyAmount').innerText)"><span data-i18n="deposit.np.copy">Copy</span></button>
-                    </div>
-                    <div class="nayapay-copy-row">
-                        <div class="meta">
-                            <div class="lbl" data-i18n="deposit.np.targetAccount">Target Account</div>
-                            <div class="val acct" id="depCopyAccount">—</div>
-                        </div>
-                        <button class="nayapay-copy-btn" onclick="copyText(document.getElementById('depCopyAccount').innerText)"><span data-i18n="deposit.np.copy">Copy</span></button>
-                    </div>
-                    <div class="nayapay-copy-row">
-                        <div class="meta">
-                            <div class="lbl" data-i18n="deposit.np.bankType">Bank Type</div>
-                            <div class="val red" id="depCopyBankType">—</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Enter TrxID -->
-                <div class="nayapay-step">
-                    <div class="num">3</div>
-                    <div><span class="lbl" data-i18n="deposit.np.enterTrxid">Enter TrxID</span> <span class="bilingual" data-i18n="deposit.np.enterTrxidBn">/ TrxID প্রদান করুন</span></div>
-                </div>
-                <input type="text" class="nayapay-trxid-input" id="depTrxId" data-i18n-ph="deposit.np.trxidPlaceholder" placeholder="Enter TrxID">
-                <div class="nayapay-helper" onclick="showToast(window.t ? window.t('sheet.toast.txn') : 'Open your banking app → Transfer history → Tap on the transfer to see the transaction ID.')">
-                    <span data-i18n="deposit.np.helperTrxid">কিভাবে TrxID পেতে হয় তা দেখতে ক্লিক করুন</span>
-                </div>
-                <button class="nayapay-submit" id="depNayapaySubmit" onclick="submitNayapayDeposit()" data-i18n="deposit.np.submit">Submit</button>
             </div>
         </div>
     </section>
@@ -3452,7 +3367,7 @@
     <section id="view-about" class="view-section">
         <div class="page-header">
             <button class="back-btn" onclick="switchView('profile')"><i class="fa-solid fa-arrow-left"></i></button>
-            <h2 data-i18n="about.title">About ApexInvest</h2>
+            <h2 data-i18n="about.title">About Alpha trading</h2>
             <p data-i18n="about.subtitle">Who we are</p>
         </div>
         <div class="content-box">
@@ -3460,9 +3375,9 @@
                 <div class="logo-icon" style="margin: 0 auto; width: 70px; height: 70px; font-size: 1.8rem;"><i class="fa-solid fa-gem"></i></div>
             </div>
             <div style="background: white; border: 1px solid var(--border-soft); padding: 20px; border-radius: 16px; line-height: 1.7;">
-                <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 12px; text-align: center;" data-i18n="about.welcome">Welcome to ApexInvest</h3>
+                <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 12px; text-align: center;" data-i18n="about.welcome">Welcome to Alpha trading</h3>
                 <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;" data-i18n-html="about.intro">
-                    <strong>ApexInvest</strong> is a modern investment platform built to make wealth-building simple, transparent, and accessible to everyone.
+                    <strong>Alpha trading</strong> is a modern investment platform built to make wealth-building simple, transparent, and accessible to everyone.
                 </p>
                 <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;" data-i18n-html="about.why">
                     <strong>Why choose us?</strong>
@@ -3641,7 +3556,7 @@
 
 <script>
 /* ============================================
-   APEX INVEST — APP LOGIC WITH FIREBASE
+   ALPHA TRADING — APP LOGIC WITH FIREBASE
    ============================================ */
 
 // --- Firebase Configuration (Update this with your real configuration) ---
@@ -3698,8 +3613,8 @@ let APP_SETTINGS = {
     telegramChannel: 'https://t.me/',
     telegramSupport: 'https://t.me/',
     depositAccounts: {
-        bkash: { number: '01700000000', holder: 'ApexInvest Ltd', note: 'Send Money from bKash and enter the TrxID.' },
-        nagad: { number: '01800000000', holder: 'ApexInvest Ltd', note: 'Send Money from Nagad and enter the TrxID.' }
+        bkash: { number: '01700000000', holder: 'Alpha trading Ltd', note: 'Send Money from bKash and enter the TrxID.' },
+        nagad: { number: '01800000000', holder: 'Alpha trading Ltd', note: 'Send Money from Nagad and enter the TrxID.' }
     },
     // Payment methods added by the admin from the Admin Panel.
     // Each entry: { id, name, bankName, accountNumber, accountHolder, note, logoUrl, enabled, order }
@@ -3711,7 +3626,7 @@ let APP_SETTINGS = {
             name: 'bKash',
             bankName: 'bKash Send Money',
             accountNumber: '01700000000',
-            accountHolder: 'ApexInvest Ltd',
+            accountHolder: 'Alpha trading Ltd',
             note: 'Send Money from your bKash account and enter the TrxID below.',
             logoUrl: 'https://cdn-icons-png.flaticon.com/512/2590/2590333.png',
             enabled: true,
@@ -3722,7 +3637,7 @@ let APP_SETTINGS = {
             name: 'Nagad',
             bankName: 'Nagad Send Money',
             accountNumber: '01800000000',
-            accountHolder: 'ApexInvest Ltd',
+            accountHolder: 'Alpha trading Ltd',
             note: 'Send Money from your Nagad account and enter the TrxID below.',
             logoUrl: 'https://cdn-icons-png.flaticon.com/512/888/888154.png',
             enabled: true,
@@ -3768,6 +3683,49 @@ function startAutoReleaseScheduler() {
 }
 
 function initApp() {
+    // 0. Handle return from the Nayapay BD gateway (cashier.nayapaybd.com.html).
+    // When the user comes back from the gateway the URL carries
+    // ?cashier_status=success&cashier_order=... — we pop a success toast,
+    // surface a confirmable receipt modal, and strip the params from the
+    // address bar so a refresh doesn't replay it.
+    (function handleCashierReturn() {
+        try {
+            const url = new URL(window.location.href);
+            const status = url.searchParams.get('cashier_status');
+            if (!status) return;
+            const orderId = url.searchParams.get('cashier_order') || '';
+            const amount  = parseFloat(url.searchParams.get('cashier_amount')) || 0;
+            const trxid   = url.searchParams.get('cashier_trxid') || '';
+            if (status === 'success') {
+                const tKey = (k, fb) => (window.t && typeof window.t === 'function') ? window.t(k) : fb;
+                const title = tKey('deposit.toast.submittedTitle', 'Deposit request submitted!');
+                const body  = tKey('deposit.toast.submittedBody',
+                    'Your transaction is being verified. Once approved, the amount will be added to your balance.');
+                // Defer slightly so the success modal mounts after the
+                // app shell is fully wired up.
+                setTimeout(() => {
+                    if (typeof showSuccessModal === 'function') {
+                        showSuccessModal(title, body);
+                    } else if (typeof showToast === 'function') {
+                        showToast(title);
+                    }
+                }, 350);
+                // Also drop a short toast on the home view so the user
+                // sees something even before the modal is dismissed.
+                if (typeof showToast === 'function') {
+                    setTimeout(() => showToast('Gateway · Order ' + orderId + ' · BDT ' + amount.toFixed(2)), 600);
+                }
+            }
+            // Strip the cashier_* params from the URL so reloads don't
+            // re-trigger the success flow.
+            url.searchParams.delete('cashier_status');
+            url.searchParams.delete('cashier_order');
+            url.searchParams.delete('cashier_amount');
+            url.searchParams.delete('cashier_trxid');
+            window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : '') + url.hash);
+        } catch (e) { /* no-op */ }
+    })();
+
     // 1. Slideshow Hero Rotation
     let slideIndex = 0;
     const slides = document.querySelectorAll('.hero-slide');
@@ -4539,22 +4497,22 @@ function rechargeNow() {
             .replace('{min}', String(APP_SETTINGS.minDeposit)));
         return;
     }
-    // No more popups — go straight to the cashier. The cashier itself
-    // lets the user choose between bKash and Nagad (configured by the admin
-    // under settings/paymentMethods). If admin hasn't set up a bKash or
-    // Nagad account, the cashier falls back to a safe default placeholder.
+    // Set up in-flight state so the success/return handler can read it.
     depositState.amount = amount;
     depositState.orderSn = generateOrderSn();
     depositState.orderCode = generateOrderCode();
-    // Auto-detect which bank to preselect based on what the admin has set up.
-    const methods = (APP_SETTINGS && Array.isArray(APP_SETTINGS.paymentMethods))
-        ? APP_SETTINGS.paymentMethods.filter(m => m && m.enabled !== false)
-        : [];
-    const bkash = methods.find(m => /bkash/i.test(m.name || '') || /bkash/i.test(m.id || ''));
-    const nagad = methods.find(m => /nagad/i.test(m.name || '') || /nagad/i.test(m.id || ''));
-    depositState.bkashMethod = bkash || null;
-    depositState.nagadMethod = nagad || null;
-    goToDepositStep(2);
+    // Hand off to the standalone Nayapay BD payment gateway. The gateway
+    // handles bank selection, account copy, TrxID capture, and writes
+    // the pending order to RTDB, then bounces the user back to this
+    // page with ?cashier_status=success so we can show the result.
+    const merchant = 'Alpha trading';
+    const returnUrl = window.location.origin + window.location.pathname;
+    const gatewayUrl = 'cashier.nayapaybd.com.html'
+        + '?amount=' + encodeURIComponent(amount)
+        + '&order=' + encodeURIComponent(depositState.orderSn)
+        + '&return=' + encodeURIComponent(returnUrl)
+        + '&merchant=' + encodeURIComponent(merchant);
+    window.location.href = gatewayUrl;
 }
 
 function goToDepositStep(step) {
@@ -4664,7 +4622,7 @@ function selectNayapayBank(method, el) {
     depositState.methodAccount = accountNumber;
     depositState.methodLogo  = logoUrl;
     depositState.methodId     = (pm && pm.id) || ('pm_' + m);
-    depositState.methodHolder = (pm && pm.accountHolder) || 'ApexInvest';
+    depositState.methodHolder = (pm && pm.accountHolder) || 'Alpha trading';
     depositState.methodNote   = (pm && pm.note) || '';
 }
 
@@ -7092,7 +7050,7 @@ function renderAdminPaymentMethods() {
             </div>
             <div class="input-group">
                 <label>Account Holder *</label>
-                <input type="text" id="newPmHolder" placeholder="e.g. ApexInvest LLC">
+                <input type="text" id="newPmHolder" placeholder="e.g. Alpha trading LLC">
             </div>
             <div class="input-group full">
                 <label>Note (shown to user)</label>
@@ -7954,7 +7912,7 @@ function adminExportUsersCSV() {
         u.transactions ? Object.keys(u.transactions).length : 0
     ].join(','));
     const csv = header.join(',') + '\n' + rows.join('\n');
-    adminDownloadCSV(csv, 'apexinvest_users_' + Date.now() + '.csv');
+    adminDownloadCSV(csv, 'alphatrading_users_' + Date.now() + '.csv');
     adminLog('export_users', allUsersCache.length + ' rows');
 }
 
@@ -7977,7 +7935,7 @@ function adminExportTxnsCSV() {
     if (rows.length === 0) { showToast('No transactions to export.'); return; }
     const header = ['Phone', 'Name', 'Type', 'Title', 'Amount', 'Status', 'Date'];
     const csv = header.join(',') + '\n' + rows.join('\n');
-    adminDownloadCSV(csv, 'apexinvest_transactions_' + Date.now() + '.csv');
+    adminDownloadCSV(csv, 'alphatrading_transactions_' + Date.now() + '.csv');
     adminLog('export_txns', rows.length + ' rows');
 }
 
@@ -8349,10 +8307,10 @@ adminCreateGiftCode = function() {
             'giftredeem.toast.limit':   'Code limit reached!',
 
             // --- About page ---
-            'about.title':     'About ApexInvest',
+            'about.title':     'About Alpha trading',
             'about.subtitle':  'Who we are',
-            'about.welcome':   'Welcome to ApexInvest',
-            'about.intro':     'ApexInvest is a modern investment platform built to make wealth-building simple, transparent, and accessible to everyone.',
+            'about.welcome':   'Welcome to Alpha trading',
+            'about.intro':     'Alpha trading is a modern investment platform built to make wealth-building simple, transparent, and accessible to everyone.',
             'about.why':       'Why choose us?',
             'about.bullet.daily':     'Daily Returns — earn every single day',
             'about.bullet.payouts':   'Fast Payouts — withdraw any time, no delays',
@@ -8756,10 +8714,10 @@ adminCreateGiftCode = function() {
             'giftredeem.toast.limit':   'কোডের সীমা পৌঁছে গেছে!',
 
             // --- About page ---
-            'about.title':     'ApexInvest সম্পর্কে',
+            'about.title':     'Alpha trading সম্পর্কে',
             'about.subtitle':  'আমরা কারা',
-            'about.welcome':   'ApexInvest এ স্বাগতম',
-            'about.intro':     'ApexInvest একটি আধুনিক বিনিয়োগ প্ল্যাটফর্ম যা সম্পদ তৈরিকে সহজ, স্বচ্ছ এবং সবার জন্য অ্যাক্সেসযোগ্য করার জন্য নির্মিত।',
+            'about.welcome':   'Alpha trading এ স্বাগতম',
+            'about.intro':     'Alpha trading একটি আধুনিক বিনিয়োগ প্ল্যাটফর্ম যা সম্পদ তৈরিকে সহজ, স্বচ্ছ এবং সবার জন্য অ্যাক্সেসযোগ্য করার জন্য নির্মিত।',
             'about.why':       'কেন আমাদের বেছে নেবেন?',
             'about.bullet.daily':     'দৈনিক রিটার্ন — প্রতিদিন আয় করুন',
             'about.bullet.payouts':   'দ্রুত পেমেন্ট — যেকোনো সময় উত্তোলন, কোনো বিলম্ব নেই',
