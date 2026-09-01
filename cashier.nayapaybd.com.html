@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Nayapay BD — Secure Payment Gateway</title>
+
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ====================================================
+           NAYAPAY BD — GATEWAY DESIGN SYSTEM
+           Brand: Nayapay BD  |  Theme: Green / Red (Nayapay)
+           ==================================================== */
+        :root {
+            --np-green:      #16a34a;
+            --np-green-dark: #15803d;
+            --np-green-deep: #0f3a22;
+            --np-red:        #ef4444;
+            --np-red-dark:   #b91c1c;
+            --np-bg:         #f4f6fb;
+            --np-card:       #ffffff;
+            --np-border:     #e2e8f0;
+            --np-border-soft:#f1f5f9;
+            --np-text:       #0f172a;
+            --np-muted:      #64748b;
+            --np-soft:       #94a3b8;
+            --np-shadow-soft:0 4px 18px rgba(15, 23, 42, 0.06);
+            --np-shadow-md:  0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        html, body { background: var(--np-bg); color: var(--np-text); min-height: 100%; }
+
+        body {
+            background:
+                radial-gradient(circle at 0% 0%, rgba(22, 163, 74, 0.10), transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(239, 68, 68, 0.08), transparent 40%),
+                var(--np-bg);
+            min-height: 100vh;
+            padding: 0 0 60px;
+        }
+
+        /* ---------- GATEWAY FRAME ---------- */
+        .gw-shell {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--np-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---------- GATEWAY HEADER (top bar with logo + security) ---------- */
+        .gw-topbar {
+            background: linear-gradient(135deg, #0f3a22 0%, #15803d 100%);
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 16px rgba(15, 58, 34, 0.25);
+        }
+        .gw-brand { display: flex; align-items: center; gap: 12px; }
+        .gw-brand-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.1rem; color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+        .gw-brand-text { line-height: 1.2; }
+        .gw-brand-name { font-weight: 800; font-size: 1.05rem; letter-spacing: 0.2px; }
+        .gw-brand-sub  { font-size: 0.7rem; opacity: 0.85; font-weight: 600; letter-spacing: 0.4px; }
+
+        .gw-secure {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .gw-secure i { color: #4ade80; font-size: 0.78rem; }
+
+        /* ---------- MERCHANT BANNER (Pay to ...) ---------- */
+        .gw-merchant {
+            background: white;
+            margin: 16px 16px 0;
+            padding: 14px 18px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--np-shadow-soft);
+            border: 1px solid var(--np-border-soft);
+        }
+        .gw-merchant .lbl {
+            font-size: 0.72rem;
+            color: var(--np-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .gw-merchant .val {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--np-text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .gw-merchant .val .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--np-green);
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
+        }
+
+        /* ---------- CASHIER CARD ---------- */
+        .gw-cashier {
+            background: white;
+            margin: 16px;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: var(--np-shadow-md);
+            border: 1px solid var(--np-border-soft);
+        }
+
+        /* Green "Amount Payable + Order No" header (Nayapay style) */
+        .nayapay-header {
+            background: linear-gradient(135deg, #1f6e3d, #16a34a);
+            color: white;
+            padding: 22px 20px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .nayapay-header .lft { display: flex; flex-direction: column; }
+        .nayapay-header .lbl { font-size: 0.78rem; opacity: 0.92; font-weight: 600; }
+        .nayapay-header .amt {
+            font-size: 1.9rem; font-weight: 800; margin-top: 4px;
+            letter-spacing: -0.5px;
+        }
+        .nayapay-header .rgt { text-align: right; max-width: 55%; }
+        .nayapay-header .rgt .lbl { font-size: 0.78rem; opacity: 0.92; font-weight: 600; }
+        .nayapay-header .rgt .val {
+            font-size: 0.9rem; font-weight: 700; margin-top: 4px;
+            font-family: 'Courier New', monospace; word-break: break-all;
+        }
+
+        .nayapay-body { padding: 18px 20px 22px; }
+
+        .nayapay-instructions {
+            border: 1.5px solid #16a34a; border-radius: 12px;
+            padding: 12px 14px; margin-bottom: 18px;
+            background: #f0fdf4; color: var(--np-green-deep);
+        }
+        .nayapay-instructions li {
+            font-size: 0.82rem; line-height: 1.5; font-weight: 600;
+            margin-bottom: 6px; padding-left: 4px;
+            list-style: none;
+        }
+        .nayapay-instructions li b { color: var(--np-red-dark); font-weight: 800; }
+
+        .nayapay-step {
+            display: flex; align-items: center; gap: 10px;
+            margin: 18px 0 10px; padding: 0 2px;
+        }
+        .nayapay-step .num {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: #16a34a; color: white; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.78rem; flex-shrink: 0;
+        }
+        .nayapay-step .lbl { font-size: 0.95rem; font-weight: 800; color: var(--np-text); }
+        .nayapay-step .bilingual { font-size: 0.78rem; color: var(--np-muted); font-weight: 600; margin-left: 4px; }
+
+        /* Choose-bank cards */
+        .nayapay-bank-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+        }
+        .nayapay-bank-card {
+            background: white; border: 2px solid var(--np-border);
+            border-radius: 14px; padding: 14px 12px;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 8px; cursor: pointer; transition: 0.2s;
+            box-shadow: var(--np-shadow-soft); min-height: 96px; position: relative;
+        }
+        .nayapay-bank-card:active { transform: scale(0.98); }
+        .nayapay-bank-card.selected { border-color: var(--np-red); background: #fff5f5; }
+        .nayapay-bank-card .nk-logo {
+            width: 52px; height: 52px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; font-weight: 800; color: white;
+        }
+        .nayapay-bank-card .nk-logo.bkash { background: #e2136e; }
+        .nayapay-bank-card .nk-logo.nagad { background: linear-gradient(135deg, #f97316, #dc2626); }
+        .nayapay-bank-card .nk-name { font-weight: 800; color: var(--np-text); font-size: 0.95rem; }
+        .nayapay-bank-card .nk-status {
+            font-size: 0.7rem; color: var(--np-green); font-weight: 800; text-transform: capitalize;
+        }
+        .nayapay-bank-card .nk-radio {
+            position: absolute; top: 8px; right: 8px;
+            width: 18px; height: 18px; border-radius: 50%;
+            border: 2px solid var(--np-border); background: white;
+        }
+        .nayapay-bank-card.selected .nk-radio { border-color: var(--np-red); }
+        .nayapay-bank-card.selected .nk-radio::after {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--np-red); margin: 3px auto 0; display: block;
+        }
+
+        /* Copy-account card */
+        .nayapay-copy-card {
+            background: #f8fafc; border: 1px solid var(--np-border-soft);
+            border-radius: 14px;
+            padding: 4px 16px;
+        }
+        .nayapay-copy-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 0; border-bottom: 1px solid var(--np-border-soft);
+        }
+        .nayapay-copy-row:last-child { border-bottom: none; }
+        .nayapay-copy-row .meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .nayapay-copy-row .meta .lbl {
+            font-size: 0.78rem; color: var(--np-muted); font-weight: 700;
+        }
+        .nayapay-copy-row .meta .val {
+            font-size: 1.05rem; color: var(--np-text); font-weight: 800;
+        }
+        .nayapay-copy-row .meta .val.acct {
+            font-family: 'Courier New', monospace; letter-spacing: 0.5px;
+        }
+        .nayapay-copy-row .meta .val.red { color: var(--np-red-dark); }
+        .nayapay-copy-btn {
+            background: var(--np-red); color: white; border: none;
+            padding: 10px 22px; border-radius: 999px;
+            font-size: 0.85rem; font-weight: 800; cursor: pointer;
+            font-family: inherit; min-width: 76px;
+        }
+        .nayapay-copy-btn:active { transform: scale(0.96); }
+
+        /* TrxID input + submit */
+        .nayapay-trxid-input {
+            width: 100%; padding: 14px 18px;
+            border: 1.5px solid var(--np-border); border-radius: 999px;
+            font-size: 0.95rem; font-weight: 600; outline: none;
+            background: white; color: var(--np-text);
+            font-family: inherit; transition: 0.2s;
+        }
+        .nayapay-trxid-input:focus { border-color: var(--np-green); }
+        .nayapay-trxid-input::placeholder { color: var(--np-soft); font-weight: 500; }
+        .nayapay-helper {
+            font-size: 0.85rem; color: #0ea5e9; font-weight: 700;
+            margin: 12px 0 18px; cursor: pointer; line-height: 1.5;
+        }
+        .nayapay-submit {
+            width: 100%; padding: 16px;
+            background: var(--np-red); color: white; border: none;
+            border-radius: 999px; font-size: 1.05rem;
+            font-weight: 800; cursor: pointer; font-family: inherit;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+            transition: 0.2s;
+        }
+        .nayapay-submit:active { transform: translateY(2px); }
+        .nayapay-submit:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
+
+        /* ---------- GATEWAY FOOTER ---------- */
+        .gw-footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--np-muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+        .gw-footer b { color: var(--np-green-dark); }
+        .gw-footer .small { font-size: 0.7rem; color: var(--np-soft); margin-top: 4px; }
+
+        .gw-trust {
+            display: flex; align-items: center; justify-content: center; gap: 16px;
+            margin-top: 10px; flex-wrap: wrap;
+        }
+        .gw-trust .chip {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.7rem; color: var(--np-muted); font-weight: 700;
+        }
+        .gw-trust .chip i { color: var(--np-green); }
+
+        /* ---------- TOAST ---------- */
+        .np-toast {
+            position: fixed;
+            left: 50%; bottom: 28px;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(15, 23, 42, 0.92);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.25s;
+            z-index: 200;
+            max-width: 90%;
+            text-align: center;
+        }
+        .np-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ---------- SUCCESS SCREEN ---------- */
+        .np-success {
+            text-align: center;
+            padding: 50px 24px 30px;
+        }
+        .np-success .check {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; font-size: 2.4rem;
+            box-shadow: 0 10px 24px rgba(22, 163, 74, 0.4);
+            margin-bottom: 18px;
+            animation: npPop 0.4s ease-out;
+        }
+        @keyframes npPop {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .np-success h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; color: var(--np-text); }
+        .np-success p { color: var(--np-muted); font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 6px; }
+        .np-success .order {
+            margin-top: 18px;
+            background: #f0fdf4;
+            border: 1px dashed #16a34a;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: inline-block;
+            font-family: 'Courier New', monospace;
+            font-weight: 800;
+            color: var(--np-green-dark);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* ---------- HOW-TO-PAY WALKTHROUGH ---------- */
+        .np-howto {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1.5px solid #3b82f6;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin: 16px 0 4px;
+        }
+        .np-howto-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #1e40af;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .np-howto-title i { color: #3b82f6; }
+        .np-howto ol {
+            padding-left: 20px;
+            margin: 0;
+        }
+        .np-howto li {
+            font-size: 0.82rem;
+            line-height: 1.55;
+            color: #1e3a8a;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .np-howto li b { color: #1e40af; font-weight: 800; }
+
+        /* ---------- CONFIRM CHECKBOX ---------- */
+        .np-confirm {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: #fff7ed;
+            border: 1.5px solid #fdba74;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin: 18px 0 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .np-confirm input[type="checkbox"] {
+            width: 20px; height: 20px;
+            margin-top: 2px;
+            accent-color: var(--np-green);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .np-confirm span {
+            font-size: 0.82rem;
+            line-height: 1.5;
+            color: #7c2d12;
+            font-weight: 700;
+        }
+        .np-confirm span b { color: #9a3412; font-weight: 800; }
+    </style>
+</head>
+<body>
+    <div class="gw-shell">
+
+        <!-- ===== GATEWAY TOP BAR ===== -->
+        <div class="gw-topbar">
+            <div class="gw-brand">
+                <div class="gw-brand-icon">N</div>
+                <div class="gw-brand-text">
+                    <div class="gw-brand-name">Nayapay BD</div>
+                    <div class="gw-brand-sub">SECURE PAYMENT GATEWAY</div>
+                </div>
+            </div>
+            <div class="gw-secure">
+                <i class="fa-solid fa-lock"></i> SSL
+            </div>
+        </div>
+
+        <!-- ===== MERCHANT BANNER ===== -->
+        <div class="gw-merchant">
+            <span class="lbl">Pay to Merchant</span>
+            <span class="val"><span class="dot"></span> <span id="merchantName">Alpha trading</span></span>
+        </div>
+
+        <!-- ===== CASHIER CARD ===== -->
+        <div class="gw-cashier" id="cashierCard">
+
+            <!-- Green header: Amount + Order -->
+            <div class="nayapay-header">
+                <div class="lft">
+                    <div class="lbl">Amount Payable / চকার পরিমাণ</div>
+                    <div class="amt">৳ <span id="cashierAmount">0.00</span></div>
+                </div>
+                <div class="rgt">
+                    <div class="lbl">Order No.</div>
+                    <div class="val" id="cashierOrder">—</div>
+                </div>
+            </div>
+
+            <div class="nayapay-body">
+
+                <!-- Instruction box (green border) -->
+                <ul class="nayapay-instructions">
+                    <li><b>"Send Money"</b> ব্যবহার করে গেটওয়ে কক্ষণ, অন্য কোনো পদ্ধতি ব্যবহার করা নিষিদ্ধ! অন্যথায় টাকা সমস্যাসৎ পৌঁছাবে না!</li>
+                    <li>সেন্ড মানি কক্ষণে পরবর্তী <b>"TrxID"</b> পুরণ করুন, অন্যথায় টাকা সমস্যাসৎ পৌঁছাবে না!</li>
+                </ul>
+
+                <!-- Step 1: Choose Bank -->
+                <div class="nayapay-step">
+                    <div class="num">1</div>
+                    <div><span class="lbl">Choose Bank</span> <span class="bilingual">/ ব্যাঙ্ক নির্বাচন করুন</span></div>
+                </div>
+                <div class="nayapay-bank-row" id="bankRow">
+                    <div class="nayapay-bank-card selected" data-method="bkash" onclick="selectBank('bkash', this)">
+                        <div class="nk-radio"></div>
+                        <div class="nk-logo bkash">bK</div>
+                        <div class="nk-name">bKash</div>
+                        <div class="nk-status" id="bkashSelected" style="display:none;">Selected</div>
+                    </div>
+                    <div class="nayapay-bank-card" data-method="nagad" onclick="selectBank('nagad', this)">
+                        <div class="nk-radio"></div>
+                        <div class="nk-logo nagad">NG</div>
+                        <div class="nk-name">Nagad</div>
+                        <div class="nk-status" id="nagadSelected" style="display:none;">Selected</div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Copy Account -->
+                <div class="nayapay-step">
+                    <div class="num">2</div>
+                    <div><span class="lbl">Copy Account Pay</span> <span class="bilingual">/ অ্যাকাউন্টে পে কপি করুন</span></div>
+                </div>
+                <div class="nayapay-copy-card">
+                    <div class="nayapay-copy-row">
+                        <div class="meta">
+                            <div class="lbl">Payment Amount</div>
+                            <div class="val"><span id="copyAmount">0.00</span></div>
+                        </div>
+                        <button class="nayapay-copy-btn" onclick="copyText(document.getElementById('copyAmount').innerText)">Copy</button>
+                    </div>
+                    <div class="nayapay-copy-row">
+                        <div class="meta">
+                            <div class="lbl">Target Account</div>
+                            <div class="val acct" id="copyAccount">—</div>
+                        </div>
+                        <button class="nayapay-copy-btn" onclick="copyText(document.getElementById('copyAccount').innerText)">Copy</button>
+                    </div>
+                    <div class="nayapay-copy-row">
+                        <div class="meta">
+                            <div class="lbl">Bank Type</div>
+                            <div class="val red" id="copyBankType">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- How-to-pay walkthrough (between Step 2 and Step 3) -->
+                <div class="np-howto">
+                    <div class="np-howto-title"><i class="fa-solid fa-circle-info"></i> How to send the money</div>
+                    <ol>
+                        <li>Tap <b>Copy</b> next to <b>Target Account</b> above.</li>
+                        <li>Open your <b id="howtoBankName">bKash</b> app and choose <b>Send Money</b>.</li>
+                        <li>Paste the account number and send exactly <b>৳<span id="howtoAmount">0.00</span></b>.</li>
+                        <li>Copy the <b>TrxID</b> from your transfer confirmation.</li>
+                        <li>Come back here and paste it in Step 3 below.</li>
+                    </ol>
+                </div>
+
+                <!-- Step 3: Enter TrxID -->
+                <div class="nayapay-step">
+                    <div class="num">3</div>
+                    <div><span class="lbl">Enter TrxID</span> <span class="bilingual">/ TrxID প্রদান করুন</span></div>
+                </div>
+                <input type="text" class="nayapay-trxid-input" id="trxId" placeholder="Enter TrxID" autocomplete="off">
+                <div class="nayapay-helper" onclick="showToast('Open your banking app → Transfer history → Tap on the transfer to see the TrxID.')">
+                    কিভাবে TrxID পেতে হয় তা দেখতে ক্লিক করুন
+                </div>
+
+                <!-- Confirmation checkbox — guards against accidental submits -->
+                <label class="np-confirm" for="confirmPaid">
+                    <input type="checkbox" id="confirmPaid">
+                    <span>I have sent the money using <b id="confirmBankName">bKash</b> Send Money and I am now entering the TrxID.</span>
+                </label>
+
+                <button class="nayapay-submit" id="submitBtn" onclick="submitPayment()">Submit TrxID</button>
+            </div>
+        </div>
+
+        <!-- ===== GATEWAY FOOTER ===== -->
+        <div class="gw-footer">
+            <p>Powered by <b>Nayapay BD</b> · v1.0</p>
+            <div class="gw-trust">
+                <div class="chip"><i class="fa-solid fa-shield-halved"></i> 256-bit SSL</div>
+                <div class="chip"><i class="fa-solid fa-lock"></i> PCI-DSS</div>
+                <div class="chip"><i class="fa-solid fa-circle-check"></i> Verified</div>
+            </div>
+            <p class="small">For <span id="merchantFooter">Alpha trading</span> customers only · All transactions are encrypted.</p>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="np-toast" id="npToast"></div>
+
+    <!-- ===== FIREBASE (RTDB) — gateway writes the pending order ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script>
+    (function () {
+        'use strict';
+
+        // ---------------------------------------------------------
+        //  Pull inbound params from the URL.
+        //  amount, order, return, merchant — all set by the main
+        //  app when it redirects the user to this gateway.
+        // ---------------------------------------------------------
+        const URL_PARAMS = new URLSearchParams(window.location.search);
+        const AMOUNT     = parseFloat(URL_PARAMS.get('amount')) || 0;
+        const ORDER_SN   = URL_PARAMS.get('order')
+            || ('NP' + String(Date.now()).padStart(12, '0'));
+        const RETURN_URL = URL_PARAMS.get('return')   || '';
+        const MERCHANT   = URL_PARAMS.get('merchant') || 'Alpha trading';
+
+        // ---------------------------------------------------------
+        //  Gateway runtime config
+        // ---------------------------------------------------------
+        const FIREBASE_CONFIG = {
+            apiKey:            "AIzaSyDQgPYCUGFQaeIfZce7eIJEtvL86k6h0yo",
+            authDomain:        "apex-2dd4d.firebaseapp.com",
+            databaseURL:       "https://apex-2dd4d-default-rtdb.firebaseio.com",
+            projectId:         "apex-2dd4d",
+            storageBucket:     "apex-2dd4d.firebasestorage.app",
+            messagingSenderId: "801465643639",
+            appId:             "1:801465643639:web:1449b4b1ac694608594c72",
+            measurementId:     "G-7CH5M42KZ9"
+        };
+
+        // Merchant-configured bank accounts. Safe defaults so the
+        // gateway always works even if no override is supplied.
+        const PAYMENT_METHODS = {
+            bkash: {
+                name:      'bKash',
+                number:    '01700000000',
+                holder:    MERCHANT + ' Ltd',
+                bankType:  'bKash Send Money',
+                logoUrl:   'https://cdn-icons-png.flaticon.com/512/2590/2590333.png'
+            },
+            nagad: {
+                name:      'Nagad',
+                number:    '01800000000',
+                holder:    MERCHANT + ' Ltd',
+                bankType:  'Nagad Send Money',
+                logoUrl:   'https://cdn-icons-png.flaticon.com/512/888/888154.png'
+            }
+        };
+
+        let selectedMethod = 'bkash';
+        let db = null;
+
+        // ---------------------------------------------------------
+        //  Firebase init
+        // ---------------------------------------------------------
+        try {
+            firebase.initializeApp(FIREBASE_CONFIG);
+            db = firebase.database();
+        } catch (e) {
+            console.error('Firebase init failed:', e);
+        }
+
+        // ---------------------------------------------------------
+        //  Pre-populate DOM from URL params so the page renders
+        //  with the correct amount / order / merchant right away.
+        // ---------------------------------------------------------
+        function prefill() {
+            const amtStr = AMOUNT > 0 ? AMOUNT.toFixed(2) : '0.00';
+            const setText = (id, v) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = v;
+            };
+            setText('cashierAmount',  amtStr);
+            setText('copyAmount',     amtStr);
+            setText('howtoAmount',    amtStr);
+            setText('cashierOrder',   ORDER_SN);
+            setText('merchantName',   MERCHANT);
+            setText('merchantFooter', MERCHANT);
+        }
+
+        // ---------------------------------------------------------
+        //  UI helpers
+        // ---------------------------------------------------------
+        function showToast(msg) {
+            const t = document.getElementById('npToast');
+            if (!t) return;
+            t.innerText = msg;
+            t.classList.add('show');
+            clearTimeout(showToast._timer);
+            showToast._timer = setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function copyText(text) {
+            if (!text || text === '—') {
+                showToast('Nothing to copy yet');
+                return;
+            }
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(
+                    () => showToast('Copied: ' + text),
+                    () => fallbackCopy(text)
+                );
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity  = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); showToast('Copied: ' + text); }
+            catch (e) { showToast('Copy failed — please copy manually'); }
+            document.body.removeChild(ta);
+        }
+
+        // ---------------------------------------------------------
+        //  Bank selection
+        // ---------------------------------------------------------
+        function selectBank(method, el) {
+            const m = (method || '').toLowerCase();
+            selectedMethod = m;
+            document.querySelectorAll('#bankRow .nayapay-bank-card').forEach(c => {
+                const cm = (c.getAttribute('data-method') || '').toLowerCase();
+                c.classList.toggle('selected', cm === m);
+                const statusEl = cm === 'bkash'
+                    ? document.getElementById('bkashSelected')
+                    : document.getElementById('nagadSelected');
+                if (statusEl) statusEl.style.display = (cm === m) ? 'block' : 'none';
+            });
+            const pm = PAYMENT_METHODS[m] || {};
+            const acct = document.getElementById('copyAccount');
+            const type = document.getElementById('copyBankType');
+            if (acct) acct.innerText = pm.number || '—';
+            if (type) type.innerText = pm.bankType || '—';
+
+            // Update the how-to-walkthrough + confirm-checkbox text so
+            // they always reflect the currently selected bank.
+            const bankLabel = (pm.name || m || '').trim() || m;
+            const howtoBank = document.getElementById('howtoBankName');
+            const confirmBank = document.getElementById('confirmBankName');
+            if (howtoBank)   howtoBank.textContent   = bankLabel;
+            if (confirmBank) confirmBank.textContent = bankLabel;
+        }
+
+        // ---------------------------------------------------------
+        //  TrxID helpers
+        // ---------------------------------------------------------
+        function refKeyFor(trxId) {
+            try {
+                return btoa(unescape(encodeURIComponent(trxId)))
+                    .replace(/[^a-zA-Z0-9]/g, '')
+                    .substring(0, 60) || ('ref_' + Date.now());
+            } catch (e) {
+                return 'ref_' + trxId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 50);
+            }
+        }
+
+        // ---------------------------------------------------------
+        //  Submit
+        // ---------------------------------------------------------
+        function submitPayment() {
+            if (!db) {
+                showToast('Network not ready, please retry in a moment.');
+                return;
+            }
+            // Guard: the user must confirm they actually sent the money
+            // before the gateway will accept the TrxID. This prevents
+            // accidental submits with made-up transaction IDs.
+            const confirmEl = document.getElementById('confirmPaid');
+            if (confirmEl && !confirmEl.checked) {
+                showToast('Please confirm you have sent the money first.');
+                if (confirmEl && confirmEl.parentElement) {
+                    confirmEl.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+            const trxEl = document.getElementById('trxId');
+            const trxId = (trxEl ? trxEl.value : '').trim();
+            if (!trxId) {
+                showToast('Please enter your TrxID');
+                if (trxEl) trxEl.focus();
+                return;
+            }
+            if (trxId.length < 4) {
+                showToast('TrxID looks too short');
+                return;
+            }
+
+            const pm       = PAYMENT_METHODS[selectedMethod] || {};
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Submitting…';
+            }
+
+            const orderId = ORDER_SN;
+            const refKey  = refKeyFor(trxId);
+
+            const orderRecord = {
+                orderSn:       orderId,
+                amount:        AMOUNT,
+                method:        selectedMethod,
+                methodName:    pm.name      || selectedMethod,
+                methodBank:    pm.bankType  || '',
+                methodAccount: pm.number    || '',
+                methodHolder:  pm.holder    || MERCHANT,
+                trxId:         trxId,
+                merchant:      MERCHANT,
+                status:        'pending',
+                source:        'nayapay-gateway',
+                createdAt:     firebase.database.ServerValue.TIMESTAMP
+            };
+
+            // Atomic write: claim the TrxID + record the order so a
+            // double-submit with the same TrxID is rejected by RTDB.
+            const updates = {};
+            updates['cashier_orders/' + orderId]   = orderRecord;
+            updates['cashier_used_refs/' + refKey] = {
+                order: orderId,
+                trxId: trxId,
+                at:    firebase.database.ServerValue.TIMESTAMP
+            };
+
+            db.ref().update(updates).then(() => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = '✓ Submitted';
+                }
+                showSuccessAndRedirect(orderId, trxId);
+            }).catch((err) => {
+                console.error('submit error:', err);
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Submit';
+                }
+                // RTDB rejects if cashier_used_refs/<key> already exists.
+                const msg = (err && err.message) ? err.message.toLowerCase() : '';
+                if (msg.indexOf('already') !== -1) {
+                    showToast('This TrxID has already been used. Please use a different one.');
+                } else {
+                    showToast('Submission failed. Please try again.');
+                }
+            });
+        }
+
+        function showSuccessAndRedirect(orderId, trxId) {
+            const card = document.getElementById('cashierCard');
+            if (card) {
+                card.innerHTML =
+                    '<div class="np-success">' +
+                        '<div class="check"><i class="fa-solid fa-check"></i></div>' +
+                        '<h2>Payment Submitted</h2>' +
+                        '<p>Your TrxID has been received and is being verified by the gateway.</p>' +
+                        '<p>You will be redirected back to the merchant shortly.</p>' +
+                        '<div class="order">Order: ' + escapeHtml(orderId) + '</div>' +
+                    '</div>';
+            }
+            showToast('Payment submitted successfully');
+
+            // Redirect back to the merchant after a short pause so the
+            // user actually sees the success state.
+            setTimeout(function () {
+                if (RETURN_URL) {
+                    const sep = RETURN_URL.indexOf('?') >= 0 ? '&' : '?';
+                    const back = RETURN_URL + sep
+                        + 'cashier_status=success'
+                        + '&cashier_order=' + encodeURIComponent(orderId)
+                        + '&cashier_amount=' + encodeURIComponent(AMOUNT)
+                        + '&cashier_trxid=' + encodeURIComponent(trxId);
+                    window.location.href = back;
+                }
+            }, 2200);
+        }
+
+        function escapeHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // ---------------------------------------------------------
+        //  Init
+        // ---------------------------------------------------------
+        prefill();
+        selectBank('bkash', null);
+
+        // Expose handlers for inline onclick attributes.
+        window.selectBank    = selectBank;
+        window.copyText      = copyText;
+        window.showToast     = showToast;
+        window.submitPayment = submitPayment;
+    })();
+    </script>
+</body>
+</html>
