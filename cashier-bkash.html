@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>BKASH Deposit Gateway</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Noto Sans Bengali', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: #f3f4f6; min-height: 100vh; color: #111; }
+
+        /* ===== HEADER (dark green, matches screenshot) ===== */
+        .gw-topbar {
+            background: #0f6e3d;
+            color: white;
+            padding: 18px 20px 14px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .gw-amount {
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .gw-subtitle {
+            font-size: 0.85rem;
+            margin-top: 4px;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+        .gw-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .gw-pay-btn {
+            background: #1dd1a1; color: white; border: none;
+            padding: 6px 14px; border-radius: 6px; font-weight: 800;
+            font-size: 0.95rem; letter-spacing: 0.5px;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .gw-lang {
+            display: inline-flex; background: white; border-radius: 4px; overflow: hidden;
+            font-size: 0.78rem; font-weight: 700;
+        }
+        .gw-lang button {
+            border: none; padding: 4px 10px; cursor: pointer; font-weight: 700;
+            background: white; color: #111;
+        }
+        .gw-lang button.active { background: #d1d5db; color: #111; }
+
+        /* ===== BODY ===== */
+        .gw-body { padding: 18px 16px; }
+
+        .gw-warning {
+            color: #ef4444; font-weight: 800; font-size: 0.95rem;
+            line-height: 1.5; margin-bottom: 14px;
+        }
+
+        /* ===== BANK DEPOSIT CARD (pink for bKash) ===== */
+        .gw-bank-card {
+            background: #d11c8c;
+            color: white;
+            border-radius: 6px;
+            padding: 14px 18px;
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 18px;
+        }
+        .gw-bank-logo {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: white;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .gw-bank-logo img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .gw-bank-logo span { font-size: 0.7rem; font-weight: 800; color: #d11c8c; }
+        .gw-bank-name { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.3px; }
+
+        /* ===== FORM FIELDS ===== */
+        .gw-label {
+            font-size: 1rem; font-weight: 800; color: #111; margin-bottom: 6px;
+        }
+        .gw-label .req { color: #ef4444; }
+        .gw-hint {
+            font-size: 0.9rem; color: #111; font-weight: 500; margin-bottom: 8px;
+        }
+        .gw-wallet {
+            background: #e5e7eb; border-radius: 4px;
+            padding: 14px 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        .gw-wallet-num { font-size: 1.1rem; font-weight: 600; color: #111; letter-spacing: 0.5px; }
+        .gw-copy-btn {
+            background: transparent; border: none; cursor: pointer; color: #0f6e3d;
+            font-size: 1.4rem; display: flex; align-items: center; justify-content: center;
+        }
+
+        .gw-trxid-input {
+            width: 100%; padding: 14px 16px;
+            border: 2px solid #ef4444; border-radius: 6px;
+            font-size: 1rem; color: #111; outline: none;
+            background: white; font-family: inherit;
+            margin-bottom: 22px;
+        }
+        .gw-trxid-input::placeholder { color: #9ca3af; }
+
+        .gw-submit-wrap { text-align: center; }
+        .gw-submit {
+            background: white; color: #111;
+            border: 1.5px solid #111; border-radius: 6px;
+            padding: 12px 60px; font-size: 1rem; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            min-width: 160px;
+        }
+        .gw-submit:active { transform: translateY(1px); }
+        .gw-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .gw-foot-warning { margin-top: 22px; }
+        .gw-foot-warning .title { font-weight: 800; font-size: 0.95rem; color: #111; margin-bottom: 4px; }
+        .gw-foot-warning .text  { color: #ef4444; font-weight: 700; font-size: 0.88rem; line-height: 1.5; margin-bottom: 6px; }
+        .gw-foot-warning .sub   { color: #6b7280; font-weight: 500; font-size: 0.82rem; line-height: 1.55; }
+
+        /* ===== TOAST ===== */
+        .np-toast {
+            position: fixed; left: 50%; bottom: 28px;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(15, 23, 42, 0.92); color: white;
+            padding: 10px 18px; border-radius: 999px;
+            font-size: 0.85rem; font-weight: 700;
+            opacity: 0; pointer-events: none; transition: 0.25s;
+            z-index: 200; max-width: 90%; text-align: center;
+        }
+        .np-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .np-success {
+            text-align: center; padding: 60px 20px 30px;
+        }
+        .np-success .check {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; font-size: 2.4rem;
+            box-shadow: 0 10px 24px rgba(22, 163, 74, 0.4);
+            margin-bottom: 18px;
+        }
+        .np-success h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+        .np-success p { color: #6b7280; font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 6px; }
+        .np-success .order {
+            margin-top: 18px; background: #f0fdf4;
+            border: 1px dashed #16a34a; border-radius: 12px;
+            padding: 12px 16px; display: inline-block;
+            font-weight: 800; color: #15803d; font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="gw-topbar">
+        <div>
+            <div class="gw-amount">BDT <span id="cashierAmount">0.00</span></div>
+            <div class="gw-subtitle">কয় বা বেশি ক্যাসআউট করবেন না</div>
+        </div>
+        <div class="gw-right">
+            <button class="gw-pay-btn" onclick="window.location.href=document.getElementById('returnUrl').textContent || ('javascript:history.back()')">
+                PAY <span style="opacity:0.85; font-weight:600; margin-left:4px;">SERVICE</span>
+            </button>
+            <div class="gw-lang">
+                <button class="active" data-lang="en" onclick="setLang(this, 'en')">EN</button>
+                <button data-lang="bn" onclick="setLang(this, 'bn')">বাং</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="gw-body" id="cashierCard">
+
+        <div class="gw-warning" id="warnText">
+            আপনি যদি টাকার পরিমাণ পরিবর্তন করেন (BDT <span id="warnAmount">0.00</span>), আপনি ক্রেডিট পেতে সক্ষম হবেন না।
+        </div>
+
+        <div class="gw-bank-card">
+            <div class="gw-bank-logo">
+                <span>bK</span>
+            </div>
+            <div class="gw-bank-name">BKASH Deposit</div>
+        </div>
+
+        <div class="gw-label">Wallet No<span class="req">*</span></div>
+        <div class="gw-hint">এই BKASH নাম্বারে শুধুমাত্র ক্যাশআউট গ্রহণ করা হয়</div>
+        <div class="gw-wallet">
+            <div class="gw-wallet-num" id="walletNum">01350106744</div>
+            <button class="gw-copy-btn" onclick="copyText(document.getElementById('walletNum').innerText)" title="Copy">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+        </div>
+
+        <div class="gw-label">ক্যাশআউটের TrxID নাম্বারটি লিখুন<span style="color:#ef4444;">(প্রয়োজন)</span></div>
+        <input type="text" class="gw-trxid-input" id="trxId" placeholder="TrxID অবশ্যই পূরণ করতে হবে!" autocomplete="off">
+
+        <div class="gw-submit-wrap">
+            <button class="gw-submit" id="submitBtn" onclick="submitPayment()">নিশ্চিত</button>
+        </div>
+
+        <div class="gw-foot-warning">
+            <div class="title">সতর্কতাঃ</div>
+            <div class="text">লেনদেন আইডি সঠিকভাবে পূরণ করতে হবে, অন্যথায় ফেরত যাবে!!</div>
+            <div class="sub">অনুগ্রহ করে নিশ্চিত হয়ে নিন যে আপনি BKASH deposit ওয়ালেট নাম্বারে ক্যাশ আউট করেছেন। এই নাম্বারে অন্য কোন ওয়ালেট থেকে ক্যাশ আউট করলে সেই টাকা পাওয়ার কোন সম্ভাবনা নাই</div>
+        </div>
+
+        <span id="returnUrl" style="display:none;"></span>
+    </div>
+
+    <div class="np-toast" id="npToast"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script>
+    (function () {
+        'use strict';
+
+        // ---- URL params ----
+        const URL_PARAMS = new URLSearchParams(window.location.search);
+        const AMOUNT     = parseFloat(URL_PARAMS.get('amount')) || 0;
+        const ORDER_SN   = URL_PARAMS.get('order')
+            || ('NPB' + String(Date.now()).padStart(12, '0'));
+        const RETURN_URL = URL_PARAMS.get('return')   || '';
+        const MERCHANT   = URL_PARAMS.get('merchant') || 'Alpha trading';
+
+        // ---- bKash wallet (Pay Channel 1) ----
+        const WALLET_NO   = '01350106744';
+        const BANK_NAME   = 'bKash';
+        const BANK_TYPE   = 'BKASH';
+
+        // ---- Firebase ----
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyC-ymgkOFtNUlJ2KLUcyJp87l98F7SkHUg",
+  authDomain: "invest-3d771.firebaseapp.com",
+  databaseURL: "https://invest-3d771-default-rtdb.firebaseio.com",
+  projectId: "invest-3d771",
+  storageBucket: "invest-3d771.firebasestorage.app",
+  messagingSenderId: "398782598680",
+  appId: "1:398782598680:web:96a8a7b739a5aa53ecfd6d",
+  measurementId: "G-2LNM5K0N6G"
+};
+
+        let db = null;
+        try {
+            firebase.initializeApp(FIREBASE_CONFIG);
+            db = firebase.database();
+        } catch (e) { console.error('Firebase init failed:', e); }
+
+        // ---- Pre-fill ----
+        const amtStr = AMOUNT > 0 ? AMOUNT.toFixed(2) : '0.00';
+        document.getElementById('cashierAmount').textContent = amtStr;
+        document.getElementById('warnAmount').textContent    = amtStr;
+        document.getElementById('returnUrl').textContent     = RETURN_URL;
+
+        // ---- UI helpers ----
+        function showToast(msg) {
+            const t = document.getElementById('npToast');
+            if (!t) return;
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => t.classList.remove('show'), 2500);
+        }
+        function copyText(text) {
+            if (!text) return;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(
+                    () => showToast('Copied: ' + text),
+                    () => fallbackCopy(text)
+                );
+            } else { fallbackCopy(text); }
+        }
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); showToast('Copied: ' + text); }
+            catch (e) { showToast('Copy failed'); }
+            document.body.removeChild(ta);
+        }
+        function setLang(btn, lang) {
+            document.querySelectorAll('.gw-lang button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        function escapeHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function refKeyFor(trxId) {
+            try {
+                return btoa(unescape(encodeURIComponent(trxId)))
+                    .replace(/[^a-zA-Z0-9]/g, '').substring(0, 60)
+                    || ('ref_' + Date.now());
+            } catch (e) { return 'ref_' + trxId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 50); }
+        }
+
+        // ---- Submit ----
+        function submitPayment() {
+            if (!db) { showToast('Network not ready, retry in a moment.'); return; }
+            const trxEl = document.getElementById('trxId');
+            const trxId = (trxEl ? trxEl.value : '').trim();
+            if (!trxId) { showToast('Please enter your TrxID'); if (trxEl) trxEl.focus(); return; }
+            if (trxId.length < 4) { showToast('TrxID looks too short'); return; }
+
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'অপেক্ষা করুন...'; }
+
+            const refKey = refKeyFor(trxId);
+            const orderRecord = {
+                orderSn:       ORDER_SN,
+                amount:        AMOUNT,
+                channel:       1,
+                method:        'bkash',
+                methodName:    'bKash',
+                methodBank:    'BKASH',
+                methodAccount: WALLET_NO,
+                methodHolder:  MERCHANT + ' Ltd',
+                trxId:         trxId,
+                merchant:      MERCHANT,
+                status:        'pending',
+                source:        'cashier-bkash',
+                createdAt:     firebase.database.ServerValue.TIMESTAMP
+            };
+            const updates = {};
+            updates['cashier_orders/' + ORDER_SN]   = orderRecord;
+            updates['cashier_used_refs/' + refKey] = {
+                order: ORDER_SN, trxId: trxId,
+                at:    firebase.database.ServerValue.TIMESTAMP
+            };
+
+            db.ref().update(updates).then(() => {
+                if (submitBtn) { submitBtn.innerText = '✓ জমা হয়েছে'; }
+                showSuccessAndRedirect();
+            }).catch(err => {
+                console.error('submit error:', err);
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'নিশ্চিত'; }
+                const msg = (err && err.message) ? err.message.toLowerCase() : '';
+                if (msg.indexOf('already') !== -1) {
+                    showToast('এই TrxID ইতিমধ্যে ব্যবহার করা হয়েছে');
+                } else {
+                    showToast('Submission failed');
+                }
+            });
+        }
+
+        function showSuccessAndRedirect() {
+            const card = document.getElementById('cashierCard');
+            if (card) {
+                card.innerHTML =
+                    '<div class="np-success">' +
+                        '<div class="check">✓</div>' +
+                        '<h2>Payment Submitted</h2>' +
+                        '<p>আপনার TrxID গ্রহণ করা হয়েছে এবং যাচাই করা হচ্ছে।</p>' +
+                        '<p>আপনাকে শীঘ্রই মার্চেন্টের কাছে ফিরিয়ে নিয়ে যাওয়া হবে।</p>' +
+                        '<div class="order">Order: ' + escapeHtml(ORDER_SN) + '</div>' +
+                    '</div>';
+            }
+            showToast('Payment submitted');
+            setTimeout(() => {
+                if (RETURN_URL) {
+                    const sep = RETURN_URL.indexOf('?') >= 0 ? '&' : '?';
+                    window.location.href = RETURN_URL + sep
+                        + 'cashier_status=success'
+                        + '&cashier_order=' + encodeURIComponent(ORDER_SN)
+                        + '&cashier_amount=' + encodeURIComponent(AMOUNT)
+                        + '&cashier_trxid=' + encodeURIComponent(document.getElementById('trxId') ? document.getElementById('trxId').value : '')
+                        + '&cashier_channel=1';
+                }
+            }, 2200);
+        }
+
+        // Expose handlers
+        window.copyText       = copyText;
+        window.setLang        = setLang;
+        window.submitPayment  = submitPayment;
+    })();
+    </script>
+</body>
+</html>
